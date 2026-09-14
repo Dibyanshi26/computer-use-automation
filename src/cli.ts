@@ -2,6 +2,7 @@ import "dotenv/config";
 import { chromium } from "playwright";
 import { runDiscovery } from "./agent/discoveryLoop.js";
 import { login } from "./agent/auth.js";
+import { DISCOVERY_SPECS } from "./agent/discoverySpecs.js";
 import { recordArtifact } from "./artifact/recorder.js";
 import { saveArtifact, loadArtifactById, loadArtifact } from "./artifact/store.js";
 import { replay } from "./replay/engine.js";
@@ -40,8 +41,21 @@ function parseArgs(argv: string[]): { positional: string[]; flags: Record<string
   return { positional, flags, inputs };
 }
 
-async function cmdRun(flags: Record<string, string | boolean>) {
-  const memberId = String(flags.memberId ?? "10001");
+async function cmdRun(flags: Record<string, string | boolean>, inputs: Record<string, unknown>) {
+  const capabilityId = String(flags.capability ?? "lookup-member-balance");
+  const spec = DISCOVERY_SPECS[capabilityId];
+  if (!spec) {
+    throw new Error(`Unknown discovery capability "${capabilityId}". Known: ${Object.keys(DISCOVERY_SPECS).join(", ")}`);
+  }
+
+  const params: Record<string, string> = {};
+  for (const param of spec.inputs) {
+    if (!(param.name in inputs)) {
+      throw new Error(`Missing --input ${param.name}=... for capability "${capabilityId}".`);
+    }
+    params[param.name] = String(inputs[param.name]);
+  }
+
   await ensureMockAppRunning(BASE_URL);
 
   const browser = await chromium.launch({ headless: !flags.headed });
@@ -50,19 +64,13 @@ async function cmdRun(flags: Record<string, string | boolean>) {
   const logger = new RunLogger(EVIDENCE_DIR, runId);
 
   try {
-    logger.log("run.start", { capability: "lookup-member-balance", memberId, baseUrl: BASE_URL });
+    logger.log("run.start", { capability: spec.id, params, baseUrl: BASE_URL });
     await login(page, BASE_URL);
     logger.log("auth.login_complete", {});
 
-    const goal =
-      `Look up member ${memberId} and read their current checking and savings balance. ` +
-      `Search using the member id field on /search, open the matching member's detail page, ` +
-      `then call extract twice: once with outputName "checkingBalance" for the checking balance value, ` +
-      `and once with outputName "savingsBalance" for the savings balance value. Then call finish with ` +
-      `success=true and outputs containing both values. If no member is found, call finish with ` +
-      `success=true and an outputs field "businessOutcome" describing that, since that is a legitimate result.`;
-
-    const result = await runDiscovery(page, { goal, startUrl: `${BASE_URL}/search`, maxSteps: 20 }, logger);
+    const goal = spec.buildGoal(params);
+    const maxSteps = flags.maxSteps ? Number(flags.maxSteps) : 20;
+    const result = await runDiscovery(page, { goal, startUrl: `${BASE_URL}${spec.startPath}`, maxSteps }, logger);
     logger.log("run.discovery_result", result as unknown as Record<string, unknown>);
 
     if (!result.success) {
@@ -72,30 +80,22 @@ async function cmdRun(flags: Record<string, string | boolean>) {
       return;
     }
 
-    const outputNames = Object.keys(result.outputs).filter((k) => k !== "businessOutcome");
+    const outputs = typeof spec.outputs === "function" ? spec.outputs(result.outputs) : spec.outputs;
     const artifact = recordArtifact(result, {
-      id: "lookup-member-balance",
-      name: "Look Up Member Balance",
+      id: spec.id,
+      name: spec.name,
       version: "1.0",
-      description: "Search for a member by ID and read their current checking and savings balance.",
-      app: "meridian-core-banking",
+      description: spec.description,
+      app: spec.app,
       baseUrl: BASE_URL,
       runId,
       discoveredBy: process.env.OPENAI_MODEL ?? "gpt-4o",
-      parameterize: { [memberId]: "memberId" },
-      inputs: [{ name: "memberId", type: "string", required: true, description: "Member ID to search for." }],
-      outputs: outputNames.map((name) => ({ name, type: "string", description: `Extracted value for ${name}.` })),
-      successCheckpoint: { type: "textPresent", text: "Checking Balance" },
-      errorHandlers: [
-        {
-          code: "member_not_found",
-          message: "No member found for the given search.",
-          condition: { type: "textPresent", text: "No member found" },
-          outcome: "business_outcome",
-          recovery: "none",
-          maxRetries: 0,
-        },
-      ],
+      parameterize: spec.parameterize(params),
+      inputs: spec.inputs,
+      outputs,
+      successCheckpoint: spec.successCheckpoint,
+      errorHandlers: spec.errorHandlers,
+      maxRiskLevel: spec.maxRiskLevel,
     });
 
     const savedPath = saveArtifact(artifact);
@@ -185,12 +185,13 @@ async function main() {
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
 
   if (cmd === "run") {
-    await cmdRun(flags);
+    await cmdRun(flags, inputs);
   } else if (cmd === "replay") {
     await cmdReplay(flags, inputs);
   } else {
     console.log(`Usage:
-  tsx src/cli.ts run --memberId <id> [--headed]
+  tsx src/cli.ts run --capability <id> --input key=value [--input key2=value2] [--headed]
+    known capabilities: ${Object.keys(DISCOVERY_SPECS).join(", ")}
   tsx src/cli.ts replay --capability <id> --input key=value [--input key2=value2] [--headed] [--with-escalation] [--auto-resume]`);
     process.exitCode = 1;
   }

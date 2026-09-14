@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.0",
+  "id": "open-subaccount-discovered",
+  "name": "Open Sub-Account (to Confirmation) [discovered]",
+  "version": "1.0",
+  "description": "Search for a member, open a new sub-account with the given type/deposit/nickname, and reach (but not submit) the confirmation screen.",
+  "target": {
+    "app": "meridian-core-banking",
+    "baseUrl": "http://localhost:4000"
+  },
+  "inputs": [
+    {
+      "name": "memberId",
+      "type": "string",
+      "required": true,
+      "description": "Member ID to search for and open a sub-account for."
+    },
+    {
+      "name": "depositAmount",
+      "type": "number",
+      "required": true,
+      "description": "Initial deposit amount in USD."
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "required": true,
+      "description": "Nickname for the new sub-account."
+    }
+  ],
+  "outputs": [],
+  "steps": [
+    {
+      "id": "s1",
+      "action": "type",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "textbox",
+          "name": "Member ID or name"
+        }
+      ],
+      "inputRef": "memberId",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s2",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "button",
+          "name": "Search"
+        }
+      ],
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s3",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "link",
+          "name": "View"
+        }
+      ],
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s4",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "link",
+          "name": "Open Sub-Account"
+        }
+      ],
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s5",
+      "action": "type",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "textbox",
+          "name": "Initial Deposit (USD)"
+        }
+      ],
+      "inputRef": "depositAmount",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s6",
+      "action": "type",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "textbox",
+          "name": "Account Nickname"
+        }
+      ],
+      "inputRef": "nickname",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s7",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "button",
+          "name": "Continue"
+        }
+      ],
+      "riskLevel": "safe"
+    }
+  ],
+  "successCheckpoint": {
+    "type": "textPresent",
+    "text": "Confirm & Open Account"
+  },
+  "errorHandlers": [
+    {
+      "code": "member_not_found",
+      "message": "No member found for the given search.",
+      "condition": {
+        "type": "textPresent",
+        "text": "No member found"
+      },
+      "outcome": "business_outcome",
+      "recovery": "none",
+      "maxRetries": 0
+    }
+  ],
+  "policy": {
+    "allowlistRef": "default",
+    "maxRiskLevel": "safe"
+  },
+  "provenance": {
+    "createdFromRunId": "discovery-1789419397735",
+    "createdAt": "2026-09-14T20:56:46.202Z",
+    "discoveredBy": "gpt-4o"
+  }
+}

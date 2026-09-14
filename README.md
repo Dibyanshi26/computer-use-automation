@@ -41,9 +41,17 @@ touches a real network beyond `localhost`.
 
 ```bash
 # 1. Discovery: a real LLM run that learns a capability from scratch.
-npx tsx src/cli.ts run --memberId 10001
+npx tsx src/cli.ts run --capability lookup-member-balance --input memberId=10001
 #   -> writes capabilities/lookup-member-balance.v1.0.json
 #   -> writes evidence/discovery-<ts>/ (log, screenshots, artifact copy)
+
+# 1b. A second, richer capability discovered the same way -- a multi-field form with a
+#     confirmation step, stopping short of the irreversible submit. `run` is driven by a
+#     small spec registry (src/agent/discoverySpecs.ts), not a hardcoded goal, so this is
+#     the only new code a second discoverable capability needs.
+npx tsx src/cli.ts run --capability open-subaccount-discovered \
+  --input memberId=10002 --input depositAmount=100 --input nickname="Emergency Fund"
+#   -> writes capabilities/open-subaccount-discovered.v1.0.json
 
 # 2. Deterministic replay of that artifact, with a DIFFERENT member than it was recorded on,
 #    and with no LLM in the loop.
@@ -104,7 +112,7 @@ src/
   safety/           allowlist, risk classifier, redaction
   escalation/        human handoff control server + mock operator console
   evidence/         structured run logger
-capabilities/       saved capability artifacts (one discovery-recorded, one hand-authored)
+capabilities/       saved capability artifacts (two discovery-recorded, one hand-authored)
 evidence/           recorded discovery + replay runs (see evidence/README.md)
 tests/              vitest unit + integration tests
 ```

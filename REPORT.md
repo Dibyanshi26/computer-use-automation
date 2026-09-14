@@ -66,6 +66,15 @@ row's *label* cell (`"Checking Balance"`, which is stable) and a structural CSS 
 last-resort fallback. This is why `evidence/02-*` (member 10002) succeeds against an artifact
 recorded on member 10001 — see `src/agent/actions.ts::computeRowLabelLocatorCss`.
 
+Two `open-subaccount-*` artifacts ship side by side on purpose: `open-subaccount-discovered` is
+the direct, unedited output of a real GPT-4o run against the goal in `evidence/09-*` — evidence
+that the model can work out a multi-field-form-with-confirmation flow entirely on its own, with no
+error taxonomy beyond the generic `member_not_found` baseline every discovery run gets.
+`open-subaccount-to-confirmation` is the same capability after a human reviewed the recording and
+attached the escalation and recoverable-error handling (§3) it doesn't yet have — record → review
+→ promote, the same lifecycle the brief describes for turning a discovery into a production
+capability.
+
 ## 3. Determinism & error handling
 
 Replay (`src/replay/engine.ts`) never calls the LLM. For each step it: resolves the ranked
