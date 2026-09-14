@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "id": "open-subaccount-to-confirmation",
+  "name": "Open Sub-Account (to Confirmation)",
+  "version": "1.0",
+  "description": "Search for a member, open a new sub-account with the given type/deposit/nickname, and reach (but not submit) the confirmation screen.",
+  "target": {
+    "app": "meridian-core-banking",
+    "baseUrl": "http://localhost:4000"
+  },
+  "inputs": [
+    { "name": "memberId", "type": "string", "required": true, "description": "Member ID to search for and open a sub-account for." },
+    { "name": "depositAmount", "type": "number", "required": true, "description": "Initial deposit amount in USD." },
+    { "name": "nickname", "type": "string", "required": true, "description": "Nickname for the new sub-account." }
+  ],
+  "outputs": [],
+  "steps": [
+    { "id": "s1", "action": "navigate", "locators": [], "value": "http://localhost:4000/search", "riskLevel": "safe" },
+    { "id": "s2", "action": "type", "locators": [{ "strategy": "role", "role": "textbox", "name": "Member ID or name" }], "inputRef": "memberId", "riskLevel": "safe" },
+    { "id": "s3", "action": "click", "locators": [{ "strategy": "role", "role": "button", "name": "Search" }], "riskLevel": "safe" },
+    {
+      "id": "s4",
+      "action": "click",
+      "locators": [{ "strategy": "role", "role": "link", "name": "View" }],
+      "checkpoint": { "type": "urlMatches", "pattern": "/member/" },
+      "riskLevel": "safe"
+    },
+    { "id": "s5", "action": "click", "locators": [{ "strategy": "role", "role": "link", "name": "Open Sub-Account" }], "riskLevel": "safe" },
+    {
+      "id": "s6",
+      "action": "select",
+      "locators": [{ "strategy": "role", "role": "combobox", "name": "Account Type" }],
+      "value": "Standard Savings",
+      "riskLevel": "safe"
+    },
+    { "id": "s7", "action": "type", "locators": [{ "strategy": "role", "role": "textbox", "name": "Initial Deposit (USD)" }], "inputRef": "depositAmount", "riskLevel": "safe" },
+    { "id": "s8", "action": "type", "locators": [{ "strategy": "role", "role": "textbox", "name": "Account Nickname" }], "inputRef": "nickname", "riskLevel": "safe" },
+    { "id": "s9", "action": "click", "locators": [{ "strategy": "role", "role": "button", "name": "Continue" }], "riskLevel": "safe" }
+  ],
+  "successCheckpoint": { "type": "textPresent", "text": "Confirm & Open Account" },
+  "errorHandlers": [
+    {
+      "code": "member_not_found",
+      "message": "No member found for the given search.",
+      "condition": { "type": "textPresent", "text": "No member found" },
+      "outcome": "business_outcome",
+      "recovery": "none",
+      "maxRetries": 0
+    },
+    {
+      "code": "supervisor_approval_required",
+      "message": "Member is flagged for manager review; supervisor override required before opening a sub-account.",
+      "condition": { "type": "textPresent", "text": "Supervisor Approval Required" },
+      "outcome": "escalate",
+      "recovery": "none",
+      "maxRetries": 1
+    },
+    {
+      "code": "invalid_deposit_amount",
+      "message": "Requested initial deposit is below the account minimum.",
+      "condition": { "type": "textPresent", "text": "Initial deposit must be at least" },
+      "outcome": "business_outcome",
+      "recovery": "none",
+      "maxRetries": 0
+    }
+  ],
+  "policy": { "allowlistRef": "default", "maxRiskLevel": "safe" },
+  "provenance": {
+    "createdFromRunId": "hand-authored-v1",
+    "createdAt": "2026-09-14T00:00:00.000Z",
+    "discoveredBy": "human-authored (see REPORT.md, Artifact schema)"
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "ts": "2026-09-14T17:31:57.754Z",
+    "type": "run.start",
+    "capability": "lookup-member-balance",
+    "inputs": {
+      "memberId": "99999"
+    },
+    "baseUrl": "http://localhost:4000"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.876Z",
+    "type": "auth.login_complete"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.876Z",
+    "type": "replay.step_start",
+    "stepId": "s1",
+    "action": "navigate"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.881Z",
+    "type": "replay.step_done",
+    "stepId": "s1"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.881Z",
+    "type": "replay.step_start",
+    "stepId": "s2",
+    "action": "type"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.895Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s2",
+    "strategy": "role"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.895Z",
+    "type": "replay.step_done",
+    "stepId": "s2"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.895Z",
+    "type": "replay.step_start",
+    "stepId": "s3",
+    "action": "click"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.953Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s3",
+    "strategy": "role"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.953Z",
+    "type": "replay.step_done",
+    "stepId": "s3"
+  },
+  {
+    "ts": "2026-09-14T17:31:57.953Z",
+    "type": "replay.step_start",
+    "stepId": "s4",
+    "action": "click"
+  },
+  {
+    "ts": "2026-09-14T17:32:00.963Z",
+    "type": "replay.error_handler_matched",
+    "code": "member_not_found",
+    "outcome": "business_outcome",
+    "step": "s4"
+  },
+  {
+    "ts": "2026-09-14T17:32:00.964Z",
+    "type": "run.replay_outcome",
+    "status": "business_outcome",
+    "code": "member_not_found",
+    "message": "No member found for the given search."
+  }
+]

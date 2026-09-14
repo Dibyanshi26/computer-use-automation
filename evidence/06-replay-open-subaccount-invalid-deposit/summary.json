@@ -1,0 +1,8 @@
+{
+  "status": "business_outcome",
+  "outcome": {
+    "status": "business_outcome",
+    "code": "invalid_deposit_amount",
+    "message": "Requested initial deposit is below the account minimum."
+  }
+}

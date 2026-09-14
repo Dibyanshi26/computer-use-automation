@@ -1,0 +1,8 @@
+{
+  "status": "success",
+  "outputs": {
+    "checkingBalance": "$2340.12",
+    "savingsBalance": "$15200.55"
+  },
+  "artifactPath": "/Users/dibyanshisingh/Desktop/Interface ai-Take Home/capabilities/lookup-member-balance.v1.0.json"
+}

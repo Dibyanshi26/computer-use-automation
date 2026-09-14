@@ -1,0 +1,12 @@
+{
+  "_comment": "Explicit, configurable allowlist enforced by src/safety/allowlist.ts. The agent (discovery or replay) refuses any action outside this list.",
+  "allowedBaseUrls": ["http://localhost:4000"],
+  "allowedRoutePatterns": ["^/(login|search|member(/.*)?)$"],
+  "allowedActionTypes": ["navigate", "click", "type", "select", "extract", "waitFor"],
+  "blockedActionNamePatterns": [
+    "delete",
+    "close account",
+    "wire transfer",
+    "reverse transaction"
+  ]
+}

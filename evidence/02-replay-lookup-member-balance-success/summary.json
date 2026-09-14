@@ -1,0 +1,10 @@
+{
+  "status": "success",
+  "outcome": {
+    "status": "success",
+    "outputs": {
+      "checkingBalance": "$500.00",
+      "savingsBalance": "$100.00"
+    }
+  }
+}

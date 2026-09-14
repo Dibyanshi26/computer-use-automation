@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "id": "lookup-member-balance",
+  "name": "Look Up Member Balance",
+  "version": "1.0",
+  "description": "Search for a member by ID and read their current checking and savings balance.",
+  "target": {
+    "app": "meridian-core-banking",
+    "baseUrl": "http://localhost:4000"
+  },
+  "inputs": [
+    {
+      "name": "memberId",
+      "type": "string",
+      "required": true,
+      "description": "Member ID to search for."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "checkingBalance",
+      "type": "string",
+      "description": "Extracted value for checkingBalance."
+    },
+    {
+      "name": "savingsBalance",
+      "type": "string",
+      "description": "Extracted value for savingsBalance."
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "action": "navigate",
+      "locators": [],
+      "value": "http://localhost:4000/search",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s2",
+      "action": "type",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "textbox",
+          "name": "Member ID or name"
+        }
+      ],
+      "inputRef": "memberId",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s3",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "button",
+          "name": "Search"
+        }
+      ],
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s4",
+      "action": "click",
+      "locators": [
+        {
+          "strategy": "role",
+          "role": "link",
+          "name": "View"
+        }
+      ],
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s5",
+      "action": "extract",
+      "locators": [
+        {
+          "strategy": "css",
+          "value": "tr:has-text(\"Checking Balance\") td:nth-of-type(2)"
+        },
+        {
+          "strategy": "role",
+          "role": "cell",
+          "name": "$2340.12"
+        }
+      ],
+      "outputRef": "checkingBalance",
+      "riskLevel": "safe"
+    },
+    {
+      "id": "s6",
+      "action": "extract",
+      "locators": [
+        {
+          "strategy": "css",
+          "value": "tr:has-text(\"Savings Balance\") td:nth-of-type(2)"
+        },
+        {
+          "strategy": "role",
+          "role": "cell",
+          "name": "$15200.55"
+        }
+      ],
+      "outputRef": "savingsBalance",
+      "riskLevel": "safe"
+    }
+  ],
+  "successCheckpoint": {
+    "type": "textPresent",
+    "text": "Checking Balance"
+  },
+  "errorHandlers": [
+    {
+      "code": "member_not_found",
+      "message": "No member found for the given search.",
+      "condition": {
+        "type": "textPresent",
+        "text": "No member found"
+      },
+      "outcome": "business_outcome",
+      "recovery": "none",
+      "maxRetries": 0
+    }
+  ],
+  "policy": {
+    "allowlistRef": "default",
+    "maxRiskLevel": "safe"
+  },
+  "provenance": {
+    "createdFromRunId": "discovery-1789407045584",
+    "createdAt": "2026-09-14T17:30:56.018Z",
+    "discoveredBy": "gpt-4o"
+  }
+}

@@ -1,0 +1,120 @@
+[
+  {
+    "ts": "2026-09-14T17:31:51.587Z",
+    "type": "run.start",
+    "capability": "lookup-member-balance",
+    "inputs": {
+      "memberId": "10002"
+    },
+    "baseUrl": "http://localhost:4000"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.780Z",
+    "type": "auth.login_complete"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.781Z",
+    "type": "replay.step_start",
+    "stepId": "s1",
+    "action": "navigate"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.788Z",
+    "type": "replay.step_done",
+    "stepId": "s1"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.788Z",
+    "type": "replay.step_start",
+    "stepId": "s2",
+    "action": "type"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.802Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s2",
+    "strategy": "role"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.802Z",
+    "type": "replay.step_done",
+    "stepId": "s2"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.802Z",
+    "type": "replay.step_start",
+    "stepId": "s3",
+    "action": "click"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.858Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s3",
+    "strategy": "role"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.858Z",
+    "type": "replay.step_done",
+    "stepId": "s3"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.858Z",
+    "type": "replay.step_start",
+    "stepId": "s4",
+    "action": "click"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.902Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s4",
+    "strategy": "role"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.902Z",
+    "type": "replay.step_done",
+    "stepId": "s4"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.902Z",
+    "type": "replay.step_start",
+    "stepId": "s5",
+    "action": "extract"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.916Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s5",
+    "strategy": "css"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.916Z",
+    "type": "replay.step_done",
+    "stepId": "s5"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.916Z",
+    "type": "replay.step_start",
+    "stepId": "s6",
+    "action": "extract"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.917Z",
+    "type": "replay.locator_resolved",
+    "stepId": "s6",
+    "strategy": "css"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.917Z",
+    "type": "replay.step_done",
+    "stepId": "s6"
+  },
+  {
+    "ts": "2026-09-14T17:31:51.919Z",
+    "type": "run.replay_outcome",
+    "status": "success",
+    "outputs": {
+      "checkingBalance": "$500.00",
+      "savingsBalance": "$100.00"
+    }
+  }
+]
