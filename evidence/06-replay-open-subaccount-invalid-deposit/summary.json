@@ -3,6 +3,7 @@
   "outcome": {
     "status": "business_outcome",
     "code": "invalid_deposit_amount",
-    "message": "Requested initial deposit is below the account minimum."
+    "message": "Requested initial deposit is below the account minimum.",
+    "screenshotPath": "screenshots/business-outcome-invalid_deposit_amount-success-checkpoint.png"
   }
 }

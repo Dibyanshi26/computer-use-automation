@@ -40,6 +40,14 @@ async function debugSnapshot(page: Page, logger: RunLogger, label: string): Prom
 
 const RECOVERABLE_RETRY_WAIT_MS = 1200;
 
+/** e.g. "business-outcome-member_not_found-s4", "recovery-dismiss-s2", "escalation-s6". */
+function screenshotLabelForHandler(handler: ErrorHandler, stepId: string): string {
+  if (handler.outcome === "business_outcome") return `business-outcome-${handler.code}-${stepId}`;
+  if (handler.outcome === "recoverable") return `recovery-${handler.recovery}-${stepId}`;
+  if (handler.outcome === "escalate") return `escalation-${stepId}`;
+  return `hard-failure-${stepId}`;
+}
+
 async function tryErrorHandlers(
   page: Page,
   handlers: ErrorHandler[],
@@ -60,13 +68,15 @@ async function tryErrorHandlers(
     const matched = await checkCondition(page, handler.condition, 250);
     if (!matched) continue;
 
-    logger.log("replay.error_handler_matched", { code: handler.code, outcome: handler.outcome, step: stepId });
+    // Captured once, immediately on match, before any recovery action or branch-specific logic
+    // runs -- every branch below reuses this same path rather than taking its own screenshot.
+    const screenshotPath = await debugSnapshot(page, logger, screenshotLabelForHandler(handler, stepId));
+    logger.log("replay.error_handler_matched", { code: handler.code, outcome: handler.outcome, step: stepId, screenshotPath });
 
     if (handler.outcome === "business_outcome") {
-      return { status: "business_outcome", code: handler.code, message: handler.message };
+      return { status: "business_outcome", code: handler.code, message: handler.message, screenshotPath };
     }
     if (handler.outcome === "hard_failure") {
-      const screenshotPath = await debugSnapshot(page, logger, `hard-failure-${stepId}`);
       return {
         status: "hard_failure",
         message: handler.message,
@@ -76,7 +86,6 @@ async function tryErrorHandlers(
     if (handler.outcome === "recoverable") {
       const used = handlerAttempts.get(handler.code) ?? 0;
       if (used >= handler.maxRetries) {
-        const screenshotPath = await debugSnapshot(page, logger, `recoverable-exhausted-${stepId}`);
         return {
           status: "hard_failure",
           message: `Recoverable condition "${handler.code}" did not clear after ${handler.maxRetries} retr${handler.maxRetries === 1 ? "y" : "ies"}.`,
@@ -102,14 +111,12 @@ async function tryErrorHandlers(
     }
     if (handler.outcome === "escalate") {
       if (!controlServer) {
-        const screenshotPath = await debugSnapshot(page, logger, `escalation-unavailable-${stepId}`);
         return {
           status: "hard_failure",
           message: `Escalation required ("${handler.message}") but no control server is configured for this run.`,
           debug: { step: stepId, expected: handler.message, observed: page.url(), screenshotPath },
         };
       }
-      const screenshotPath = await debugSnapshot(page, logger, `escalation-${stepId}`);
       logger.log("escalation.requested", { step: stepId, reason: handler.message });
       const interventionDetails: Omit<InterventionRequest, "createdAt"> = {
         runId,

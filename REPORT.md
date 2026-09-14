@@ -108,12 +108,17 @@ case where a step *is* risky and must be escalated, to prove that path works eve
 evidence run needed it.
 
 Business outcomes and hard failures are deliberately structured differently in the result
-contract (`src/replay/outcomes.ts`): a business outcome is `{status, code, message}` — clean,
-cacheable, meant for the calling agent to branch on. A hard failure carries `debug: {step,
-expected, observed, screenshotPath}` — meant for a human to diagnose, never for the calling agent
-to parse as if it were a business answer. Conflating those two is, per the brief, the most common
-mistake here, so the type system keeps them structurally distinct rather than relying on a status
-string convention.
+contract (`src/replay/outcomes.ts`): a business outcome is `{status, code, message,
+screenshotPath}` — clean, cacheable, meant for the calling agent to branch on, with the
+screenshot as supporting evidence of the page state the answer came from rather than something
+the caller needs to inspect. A hard failure carries `debug: {step, expected, observed,
+screenshotPath}` — meant for a human to diagnose, never for the calling agent to parse as if it
+were a business answer. Conflating those two is, per the brief, the most common mistake here, so
+the type system keeps them structurally distinct rather than relying on a status string
+convention. Every handler match — regardless of outcome — captures its screenshot at the moment
+of match, before any recovery action or return runs, and every branch downstream reuses that same
+capture rather than taking its own (`replay/engine.ts`'s `screenshotLabelForHandler`), so there's
+exactly one image per match, not one per branch.
 
 UI drift (secondary, per the brief) is handled by the same ranked-locator/fallback mechanism —
 a renamed button breaks the primary `role+name` locator, replay falls back to `text`/`css`, and

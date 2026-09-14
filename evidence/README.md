@@ -1,9 +1,14 @@
 # Evidence
 
 Each directory is one run: `log.json` (structured event log), `summary.json` (final outcome),
-`screenshots/` (per-step captures; hard-failure/escalation runs also get a labeled failure
-screenshot), and — for the discovery run only — `artifact.json` (the capability recorded from
-that run, also saved to `/capabilities`).
+`screenshots/`, and — for the discovery run only — `artifact.json` (the capability recorded from
+that run, also saved to `/capabilities`). Any run where an error handler matches (business
+outcome, recoverable, hard failure, or escalation) captures a screenshot of the page state at the
+moment of the match — labeled by outcome and step, e.g. `business-outcome-member_not_found-s4.png`
+or `recovery-dismiss-s2.png` — before any recovery action or return, so the image always shows
+what the handler actually saw. Its path is also carried on the result itself for a
+`business_outcome` (`outcome.screenshotPath`) and logged as a field on the
+`replay.error_handler_matched` event for every outcome type.
 
 | Run | Type | What it shows |
 |---|---|---|
