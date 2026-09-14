@@ -155,3 +155,35 @@ export function accountOpenedPage(member: Member): string {
     `<h2 id="success-heading">Sub-Account Opened</h2><p>A new sub-account was opened for ${member.name} (${member.id}).</p><p><a href="/search">Back to Search</a></p>`
   );
 }
+
+/**
+ * Error-injection pages (see app.ts's ?inject= middleware). These stand in for two real runtime
+ * conditions a legacy app throws at a replay: an unexpected interstitial that must be dismissed,
+ * and a transient slow load that clears on its own. `target` is the path the user actually
+ * wanted, so recovering (dismissing, or waiting out the delay) lands back on the intended page.
+ */
+export function sessionNoticePage(target: string): string {
+  return shell(
+    "Session Notice",
+    `
+<h2>Session Notice</h2>
+<p>Your session encountered a temporary notice. Please dismiss this notice to continue.</p>
+<form method="get" action="${target}">
+  <button type="submit">Dismiss</button>
+</form>`
+  );
+}
+
+export function slowLoadPage(target: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <title>Please wait - Meridian Core Banking</title>
+  <meta http-equiv="refresh" content="4;url=${target}">
+</head>
+<body bgcolor="#ffffff">
+<h2>Please wait</h2>
+<p>Your request is taking longer than usual to process. This page will continue automatically.</p>
+</body>
+</html>`;
+}

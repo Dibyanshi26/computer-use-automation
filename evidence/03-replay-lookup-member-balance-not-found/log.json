@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-09-14T17:31:57.754Z",
+    "ts": "2026-09-14T20:25:07.429Z",
     "type": "run.start",
     "capability": "lookup-member-balance",
     "inputs": {
@@ -9,69 +9,69 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-14T17:31:57.876Z",
+    "ts": "2026-09-14T20:25:07.597Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-14T17:31:57.876Z",
+    "ts": "2026-09-14T20:25:07.597Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "navigate"
   },
   {
-    "ts": "2026-09-14T17:31:57.881Z",
+    "ts": "2026-09-14T20:25:07.605Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-14T17:31:57.881Z",
+    "ts": "2026-09-14T20:25:07.605Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T17:31:57.895Z",
+    "ts": "2026-09-14T20:25:07.630Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T17:31:57.895Z",
+    "ts": "2026-09-14T20:25:07.630Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-14T17:31:57.895Z",
+    "ts": "2026-09-14T20:25:07.630Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T17:31:57.953Z",
+    "ts": "2026-09-14T20:25:07.678Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T17:31:57.953Z",
+    "ts": "2026-09-14T20:25:07.678Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-14T17:31:57.953Z",
+    "ts": "2026-09-14T20:25:07.678Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T17:32:00.963Z",
+    "ts": "2026-09-14T20:25:10.691Z",
     "type": "replay.error_handler_matched",
     "code": "member_not_found",
     "outcome": "business_outcome",
     "step": "s4"
   },
   {
-    "ts": "2026-09-14T17:32:00.964Z",
+    "ts": "2026-09-14T20:25:10.692Z",
     "type": "run.replay_outcome",
     "status": "business_outcome",
     "code": "member_not_found",

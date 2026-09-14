@@ -38,7 +38,25 @@
     { "id": "s9", "action": "click", "locators": [{ "strategy": "role", "role": "button", "name": "Continue" }], "riskLevel": "safe" }
   ],
   "successCheckpoint": { "type": "textPresent", "text": "Confirm & Open Account" },
+  "_errorHandlersComment": "Time-sensitive technical conditions (slow_load, session_notice_interstitial) are listed before business-outcome/escalation handlers: each handler condition is checked with a short, non-waiting poll (see replay/engine.ts), so a condition that can clear on its own (a meta-refresh, an auto-dismissing notice) must be checked early or a slower-to-reach handler further down the list may miss its window entirely.",
   "errorHandlers": [
+    {
+      "code": "slow_load",
+      "message": "The page is taking longer than usual to load; waiting and retrying.",
+      "condition": { "type": "textPresent", "text": "Please wait" },
+      "outcome": "recoverable",
+      "recovery": "retry",
+      "maxRetries": 2
+    },
+    {
+      "code": "session_notice_interstitial",
+      "message": "An unexpected session notice interstitial appeared; dismissing and retrying.",
+      "condition": { "type": "textPresent", "text": "Session Notice" },
+      "outcome": "recoverable",
+      "recovery": "dismiss",
+      "dismissLocator": { "strategy": "role", "role": "button", "name": "Dismiss" },
+      "maxRetries": 1
+    },
     {
       "code": "member_not_found",
       "message": "No member found for the given search.",

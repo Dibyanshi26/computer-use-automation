@@ -10,6 +10,8 @@ import {
   openSubAccountForm,
   confirmationPage,
   accountOpenedPage,
+  sessionNoticePage,
+  slowLoadPage,
 } from "./views.js";
 
 const app = express();
@@ -30,6 +32,31 @@ function requireSession(req: express.Request, res: express.Response, next: expre
   }
   next();
 }
+
+const INJECT_MODES = new Set(["slow", "interstitial", "timeout"]);
+
+/**
+ * Test-only fault injector: `?inject=slow|interstitial|timeout` on any GET route renders that
+ * condition instead of the route's real response. Entirely opt-in via the query param, so
+ * uninjected requests (the default, and every route except the query string itself) are
+ * byte-for-byte unchanged. Exists so replay's recoverable-error handling can be exercised
+ * deterministically rather than waiting for a real slow network or interstitial to occur.
+ */
+app.get("*", (req, res, next) => {
+  const inject = req.query.inject as string | undefined;
+  if (!inject || !INJECT_MODES.has(inject) || req.path === "/login") {
+    next();
+    return;
+  }
+  const target = req.path;
+  if (inject === "timeout") {
+    res.redirect("/login");
+  } else if (inject === "interstitial") {
+    res.send(sessionNoticePage(target));
+  } else {
+    res.send(slowLoadPage(target));
+  }
+});
 
 app.get("/login", (_req, res) => {
   res.send(loginPage());

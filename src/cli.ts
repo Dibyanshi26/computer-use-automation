@@ -122,6 +122,18 @@ async function cmdReplay(flags: Record<string, string | boolean>, inputs: Record
     else inputs[param.name] = String(raw);
   }
 
+  // Demo/test hook: attach ?inject=<mode> to the artifact's first navigate step so the mock
+  // app renders a controlled fault (slow/interstitial/timeout) instead of its normal response,
+  // exercising replay's recoverable-error handling deterministically. See src/mock-app/app.ts.
+  if (flags.inject) {
+    const navStep = artifact.steps.find((s) => s.action === "navigate" && s.value);
+    if (!navStep || !navStep.value) {
+      throw new Error("--inject requires the artifact to have a navigate step with a literal URL.");
+    }
+    const sep = navStep.value.includes("?") ? "&" : "?";
+    navStep.value = `${navStep.value}${sep}inject=${flags.inject}`;
+  }
+
   const browser = await chromium.launch({ headless: !flags.headed });
   const page = await browser.newPage();
   const runId = `replay-${capabilityId}-${Date.now()}`;

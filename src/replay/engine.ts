@@ -38,6 +38,8 @@ async function debugSnapshot(page: Page, logger: RunLogger, label: string): Prom
   return logger.screenshot(page, label);
 }
 
+const RECOVERABLE_RETRY_WAIT_MS = 1200;
+
 async function tryErrorHandlers(
   page: Page,
   handlers: ErrorHandler[],
@@ -46,10 +48,16 @@ async function tryErrorHandlers(
   runId: string,
   controlServer: ControlServer | undefined,
   autoResume: ReplayOptions["autoResume"],
-  artifact: CapabilityArtifact
+  artifact: CapabilityArtifact,
+  handlerAttempts: Map<string, number>
 ): Promise<ReplayOutcome | { retry: true } | null> {
   for (const handler of handlers) {
-    const matched = await checkCondition(page, handler.condition, 1500);
+    // Short and deliberate: this is "is this condition true right now", not "wait for it to
+    // become true" (that's what resolveStep's own timeout, above, already did). A long timeout
+    // here would let a time-sensitive condition (e.g. a page auto-recovering from a slow load)
+    // slip past its window while we're still sequentially checking earlier, non-matching
+    // handlers -- see the "slow load" handler and the note on handler ordering below.
+    const matched = await checkCondition(page, handler.condition, 250);
     if (!matched) continue;
 
     logger.log("replay.error_handler_matched", { code: handler.code, outcome: handler.outcome, step: stepId });
@@ -66,6 +74,30 @@ async function tryErrorHandlers(
       };
     }
     if (handler.outcome === "recoverable") {
+      const used = handlerAttempts.get(handler.code) ?? 0;
+      if (used >= handler.maxRetries) {
+        const screenshotPath = await debugSnapshot(page, logger, `recoverable-exhausted-${stepId}`);
+        return {
+          status: "hard_failure",
+          message: `Recoverable condition "${handler.code}" did not clear after ${handler.maxRetries} retr${handler.maxRetries === 1 ? "y" : "ies"}.`,
+          debug: { step: stepId, expected: handler.message, observed: page.url(), screenshotPath },
+        };
+      }
+      handlerAttempts.set(handler.code, used + 1);
+
+      if (handler.recovery === "dismiss" && handler.dismissLocator) {
+        const resolved = await resolveStep(page, [handler.dismissLocator], 2000);
+        if (resolved) {
+          logger.log("replay.recovery_dismiss", { code: handler.code, attempt: used + 1 });
+          await resolved.locator.click();
+          await page.waitForLoadState("domcontentloaded").catch(() => {});
+        } else {
+          logger.log("replay.recovery_dismiss_locator_not_found", { code: handler.code });
+        }
+      } else if (handler.recovery === "retry") {
+        logger.log("replay.recovery_wait_retry", { code: handler.code, attempt: used + 1, waitMs: RECOVERABLE_RETRY_WAIT_MS });
+        await page.waitForTimeout(RECOVERABLE_RETRY_WAIT_MS);
+      }
       return { retry: true };
     }
     if (handler.outcome === "escalate") {
@@ -126,8 +158,10 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
     // A flat retry cap covers both "recoverable" handlers (retry after a wait/dismiss) and
     // "escalate" handlers (retry once the human has resumed and changed the page state) --
     // termination is really driven by reaching a terminal outcome or a resolvable locator,
-    // not by counting attempts, so this is a safety bound rather than a precise budget.
-    const maxAttemptsForStep = artifact.errorHandlers.length > 0 ? 5 : 1;
+    // not by counting attempts, so this is a safety bound rather than a precise budget. Each
+    // recoverable handler additionally enforces its own maxRetries via handlerAttempts below.
+    const maxAttemptsForStep = artifact.errorHandlers.length > 0 ? 8 : 1;
+    const handlerAttempts = new Map<string, number>();
 
     stepRetryLoop: while (attempt < maxAttemptsForStep) {
       attempt += 1;
@@ -141,7 +175,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
         } else {
           const resolved = await resolveStep(page, step.locators);
           if (!resolved) {
-            const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact);
+            const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
             if (outcome && "retry" in outcome) continue stepRetryLoop;
             if (outcome) return outcome;
             const screenshotPath = await debugSnapshot(page, logger, `hard-failure-${step.id}`);
@@ -198,7 +232,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
         if (step.checkpoint) {
           const ok = await checkCondition(page, step.checkpoint);
           if (!ok) {
-            const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact);
+            const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
             if (outcome && "retry" in outcome) continue stepRetryLoop;
             if (outcome) return outcome;
             const screenshotPath = await debugSnapshot(page, logger, `hard-failure-checkpoint-${step.id}`);
@@ -215,7 +249,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
         if (err instanceof GuardrailViolation) {
           return { status: "hard_failure", message: `Guardrail violation: ${err.message}`, debug: { step: step.id, expected: "allowlisted action", observed: err.message } };
         }
-        const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact);
+        const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
         if (outcome && "retry" in outcome) continue stepRetryLoop;
         if (outcome) return outcome;
         const screenshotPath = await debugSnapshot(page, logger, `hard-failure-exception-${step.id}`);
@@ -230,10 +264,31 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
     logger.log("replay.step_done", { stepId: step.id });
   }
 
-  const finalOk = await checkCondition(page, artifact.successCheckpoint);
+  const finalHandlerAttempts = new Map<string, number>();
+  const maxFinalAttempts = artifact.errorHandlers.length > 0 ? 8 : 1;
+  let finalOk = await checkCondition(page, artifact.successCheckpoint);
+  let finalAttempt = 0;
+  while (!finalOk && finalAttempt < maxFinalAttempts) {
+    finalAttempt += 1;
+    const outcome = await tryErrorHandlers(
+      page,
+      artifact.errorHandlers,
+      "success-checkpoint",
+      logger,
+      runId,
+      opts.controlServer,
+      opts.autoResume,
+      artifact,
+      finalHandlerAttempts
+    );
+    if (outcome && "retry" in outcome) {
+      finalOk = await checkCondition(page, artifact.successCheckpoint);
+      continue;
+    }
+    if (outcome) return outcome;
+    break;
+  }
   if (!finalOk) {
-    const outcome = await tryErrorHandlers(page, artifact.errorHandlers, "success-checkpoint", logger, runId, opts.controlServer, opts.autoResume, artifact);
-    if (outcome && !("retry" in outcome)) return outcome;
     const screenshotPath = await debugSnapshot(page, logger, "hard-failure-final-checkpoint");
     return {
       status: "hard_failure",

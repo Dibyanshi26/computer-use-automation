@@ -63,10 +63,23 @@ npx tsx src/cli.ts replay --capability open-subaccount-to-confirmation \
   --with-escalation --auto-resume
 #   with --with-escalation (no --auto-resume), the mock operator console is served at
 #   http://localhost:4100 and the run blocks until a real person clicks Resume there.
+
+# 6. Replay hitting a recoverable, self-clearing interstitial -> dismissed automatically, no
+#    human involved.
+npx tsx src/cli.ts replay --capability open-subaccount-to-confirmation \
+  --input memberId=10002 --input depositAmount=100 --input nickname="Emergency Fund" \
+  --inject interstitial
+
+# 7. Replay hitting a recoverable, transient slow load -> waited out and retried automatically.
+npx tsx src/cli.ts replay --capability open-subaccount-to-confirmation \
+  --input memberId=10002 --input depositAmount=100 --input nickname="Emergency Fund" \
+  --inject slow
 ```
 
 Useful flags: `--headed` (show the browser), `--with-escalation` (start the mock operator
-console), `--auto-resume` (scripted stand-in for a human operator, for reproducible evidence).
+console), `--auto-resume` (scripted stand-in for a human operator, for reproducible evidence),
+`--inject <slow|interstitial|timeout>` (make the mock app's first page load fail in a controlled,
+reproducible way — see `src/mock-app/app.ts`).
 
 ## Tests
 
@@ -75,8 +88,9 @@ npm test
 ```
 
 Runs schema validation, safety/guardrail unit tests, and replay-engine integration tests
-(success, business outcome, hard failure, and risky-action escalation) against a real, in-process
-instance of the mock app and a real headless browser.
+(success, business outcome, hard failure, risky-action escalation, and both recoverable-error
+paths — dismiss and retry) against a real, in-process instance of the mock app and a real
+headless browser.
 
 ## Repo layout
 

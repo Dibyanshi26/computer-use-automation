@@ -70,6 +70,8 @@ export const ErrorHandlerSchema = z.object({
   // For "recoverable": what to do before re-checking the primary checkpoint.
   recovery: z.enum(["retry", "dismiss", "none"]).default("none"),
   maxRetries: z.number().int().min(0).max(5).default(0),
+  // For recovery "dismiss": the control to click to clear the interstitial before retrying.
+  dismissLocator: LocatorSchema.optional(),
 });
 export type ErrorHandler = z.infer<typeof ErrorHandlerSchema>;
 

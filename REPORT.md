@@ -77,9 +77,25 @@ consults `errorHandlers` — each one is a `condition` (the same checkpoint voca
 | Outcome | Meaning | Example |
 |---|---|---|
 | `business_outcome` | Not a failure — a legitimate, caller-relevant answer | member not found, deposit below minimum |
-| `recoverable` | Transient; retry (bounded) | not exercised by name in this build (see Cuts) but wired identically to `escalate`'s retry path |
-| `hard_failure` | Genuine dead end; return step/expected/observed + a screenshot | unrecognized page state, no handler matches |
+| `recoverable` | Transient; clear it, then retry the step (bounded per handler by `maxRetries`) | an unexpected interstitial (`recovery: "dismiss"`, clicks a declared `dismissLocator`); a slow load that clears on its own (`recovery: "retry"`, waits then rechecks) |
+| `hard_failure` | Genuine dead end; return step/expected/observed + a screenshot | unrecognized page state, no handler matches, or a recoverable handler exhausted its retries |
 | `escalate` | Can't safely proceed without a human decision | authorization exception; a risky/irreversible step |
+
+`recoverable` is the one outcome where *how* to recover matters, not just *whether* to: `recovery:
+"dismiss"` resolves a declared `dismissLocator` and clicks it (the interstitial's own escape
+hatch); `recovery: "retry"` just waits (`src/replay/engine.ts`'s `RECOVERABLE_RETRY_WAIT_MS`) and
+re-checks. Each handler tracks its own attempt count against its own `maxRetries` (a
+`Map<code, count>` scoped to the current step), so one exhausted handler degrades to a specific,
+debuggable `hard_failure` ("condition X did not clear after N retries") rather than a generic
+one. `evidence/07-*` and `08-*` exercise dismiss and retry respectively, using a `?inject=` fault
+injector built into the mock app (`src/mock-app/app.ts`) specifically so these conditions are
+reproducible on demand rather than waiting for a real slow network. One subtlety this surfaced:
+condition checks are intentionally short (250ms — "is this true *right now*", not "wait for it to
+become true", since the primary locator resolution already did the waiting) and technical
+conditions are listed before business-outcome conditions in the artifact's `errorHandlers`, because
+a time-sensitive condition (a page that's about to auto-recover) can otherwise slip past its
+window while earlier, non-matching handlers are still being checked — see the artifact's
+`_errorHandlersComment`.
 
 A **second, independent trigger for escalation** exists outside `errorHandlers`: any step whose
 `riskLevel` is `risky` (classified by `src/safety/riskClassifier.ts` from the target's accessible
@@ -192,10 +208,11 @@ scale, not at hundreds.
 
 - **Multi-tenant and desktop support are designed, not built** (§4), per the brief's explicit
   scope note.
-- **`recoverable` (retry/dismiss transient conditions)** is implemented in the engine's control
-  flow but no error handler in either shipped capability uses it — both example flows didn't
-  produce a natural transient-load case worth faking. The retry loop and its `maxRetries` plumbing
-  are real and covered by the same code path `escalate` uses.
+- **`recoverable` (retry/dismiss transient conditions) is now implemented and exercised** (both
+  `evidence/07-*` and `08-*`) via a `?inject=` fault injector added to the mock app specifically to
+  make these conditions reproducible on demand, since neither shipped flow naturally hits a real
+  interstitial or slow load. The injector (`src/mock-app/app.ts`) is opt-in per-request and touches
+  no other code path, so uninjected behavior — every existing evidence run and test — is unchanged.
 - **Risky-action escalation has no dedicated evidence run** — it's covered by
   `tests/engine.test.ts` instead, to avoid a fourth near-duplicate `evidence/` folder. Given more
   time I'd add it as a recorded run for completeness.

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { Server } from "node:http";
+import fs from "node:fs";
 import { chromium, type Browser, type Page } from "playwright";
 import { app } from "../src/mock-app/app.js";
 import { login } from "../src/agent/auth.js";
@@ -111,4 +112,50 @@ describe("replay engine", () => {
     expect(escalationSeen).toBe(true);
     expect(outcome.status).toBe("success");
   });
+
+  it("recovers from an unexpected interstitial by dismissing it, then continues (recovery: dismiss)", async () => {
+    const artifact = loadArtifactById("open-subaccount-to-confirmation");
+    artifact.target.baseUrl = BASE_URL;
+    const navStep = artifact.steps.find((s) => s.action === "navigate");
+    navStep!.value = `${navStep!.value}?inject=interstitial`;
+
+    await login(page, BASE_URL);
+    const logger = testLogger("recoverable-interstitial");
+    const outcome = await replay({
+      artifact,
+      inputs: { memberId: "10002", depositAmount: 100, nickname: "Test" },
+      page,
+      logger,
+      runId: "t5",
+    });
+
+    expect(outcome.status).toBe("success");
+    logger.finalize({ status: outcome.status });
+    const events = JSON.parse(fs.readFileSync(`${logger.runDir}/log.json`, "utf-8"));
+    expect(events.some((e: any) => e.type === "replay.error_handler_matched" && e.code === "session_notice_interstitial")).toBe(true);
+    expect(events.some((e: any) => e.type === "replay.recovery_dismiss")).toBe(true);
+  });
+
+  it("recovers from a transient slow load by waiting and retrying (recovery: retry)", async () => {
+    const artifact = loadArtifactById("open-subaccount-to-confirmation");
+    artifact.target.baseUrl = BASE_URL;
+    const navStep = artifact.steps.find((s) => s.action === "navigate");
+    navStep!.value = `${navStep!.value}?inject=slow`;
+
+    await login(page, BASE_URL);
+    const logger = testLogger("recoverable-slow-load");
+    const outcome = await replay({
+      artifact,
+      inputs: { memberId: "10002", depositAmount: 100, nickname: "Test" },
+      page,
+      logger,
+      runId: "t6",
+    });
+
+    expect(outcome.status).toBe("success");
+    logger.finalize({ status: outcome.status });
+    const events = JSON.parse(fs.readFileSync(`${logger.runDir}/log.json`, "utf-8"));
+    expect(events.some((e: any) => e.type === "replay.error_handler_matched" && e.code === "slow_load")).toBe(true);
+    expect(events.some((e: any) => e.type === "replay.recovery_wait_retry")).toBe(true);
+  }, 15000);
 });
