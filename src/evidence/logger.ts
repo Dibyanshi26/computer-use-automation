@@ -23,8 +23,11 @@ export class RunLogger {
   log(type: string, data: Record<string, unknown> = {}): void {
     const event: LogEvent = { ts: new Date().toISOString(), type, ...redactObject(data) };
     this.events.push(event);
+    // Print the already-redacted event, not the raw `data` -- otherwise a secret that never
+    // reaches the persisted log.json would still leak to stdout (and anything that captures it).
+    const { ts, type: _type, ...rest } = event;
     // eslint-disable-next-line no-console
-    console.log(`[${event.ts}] ${type}`, JSON.stringify(data).slice(0, 300));
+    console.log(`[${ts}] ${type}`, JSON.stringify(rest).slice(0, 300));
   }
 
   async screenshot(page: Page, label: string): Promise<string> {
@@ -34,7 +37,7 @@ export class RunLogger {
   }
 
   writeArtifactCopy(artifact: unknown): void {
-    fs.writeFileSync(path.join(this.runDir, "artifact.json"), JSON.stringify(artifact, null, 2));
+    fs.writeFileSync(path.join(this.runDir, "artifact.json"), JSON.stringify(redactObject(artifact), null, 2));
   }
 
   finalize(summary: Record<string, unknown>): void {

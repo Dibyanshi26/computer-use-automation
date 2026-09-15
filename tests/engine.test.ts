@@ -70,6 +70,42 @@ describe("replay engine", () => {
     }
   });
 
+  it("refuses to replay a step whose live target matches a blocked-action name, even when riskLevel says safe", async () => {
+    // No mock-app navigation needed: the artifact has a single step and no navigate action, so
+    // this exercises the blocklist check in isolation against a live, resolvable element whose
+    // name is deliberately mislabeled riskLevel: "safe" in the artifact.
+    await page.setContent(`<button type="button">Delete Account</button>`);
+    const artifact: CapabilityArtifact = {
+      schemaVersion: "1.0",
+      id: "blocklist-test",
+      name: "Blocklist Test",
+      version: "1.0",
+      description: "test",
+      target: { app: "meridian-core-banking", baseUrl: BASE_URL },
+      inputs: [],
+      outputs: [],
+      steps: [
+        {
+          id: "s1",
+          action: "click",
+          locators: [{ strategy: "role", role: "button", name: "Delete Account" }],
+          riskLevel: "safe",
+        },
+      ],
+      successCheckpoint: { type: "textPresent", text: "Delete Account" },
+      errorHandlers: [],
+      policy: { allowlistRef: "default", maxRiskLevel: "safe" },
+      provenance: { createdFromRunId: "test", createdAt: new Date().toISOString(), discoveredBy: "test" },
+    };
+
+    const outcome = await replay({ artifact, inputs: {}, page, logger: testLogger("blocklist"), runId: "t-blocklist" });
+    expect(outcome.status).toBe("hard_failure");
+    if (outcome.status === "hard_failure") {
+      expect(outcome.message.toLowerCase()).toContain("blocked");
+      expect(outcome.debug.step).toBe("s1");
+    }
+  });
+
   it("escalates a risky/irreversible step to a human instead of executing it, then continues after resume", async () => {
     const base = loadArtifactById("open-subaccount-to-confirmation");
     const artifact: CapabilityArtifact = {

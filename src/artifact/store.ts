@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { CapabilityArtifactSchema, type CapabilityArtifact } from "./schema.js";
+import { redactObject } from "../safety/redact.js";
 
 const DEFAULT_DIR = path.join(process.cwd(), "capabilities");
 
 export function saveArtifact(artifact: CapabilityArtifact, dir: string = DEFAULT_DIR): string {
   fs.mkdirSync(dir, { recursive: true });
   const file = path.join(dir, `${artifact.id}.v${artifact.version}.json`);
-  fs.writeFileSync(file, JSON.stringify(artifact, null, 2));
+  fs.writeFileSync(file, JSON.stringify(redactObject(artifact), null, 2));
   return file;
 }
 

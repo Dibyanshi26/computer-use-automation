@@ -3,7 +3,7 @@ import type { CapabilityArtifact, ErrorHandler } from "../artifact/schema.js";
 import type { ReplayOutcome, DebugInfo } from "./outcomes.js";
 import { resolveStep } from "./locator.js";
 import { checkCondition } from "./checkpoint.js";
-import { assertUrlAllowed, assertOriginAllowed, assertActionTypeAllowed, GuardrailViolation } from "../safety/allowlist.js";
+import { assertUrlAllowed, assertOriginAllowed, assertActionTypeAllowed, isBlockedByName, GuardrailViolation } from "../safety/allowlist.js";
 import type { RunLogger } from "../evidence/logger.js";
 import type { ControlServer, InterventionRequest, ResumeSignal } from "../escalation/controlServer.js";
 
@@ -71,6 +71,10 @@ function screenshotLabelForHandler(handler: ErrorHandler, stepId: string): strin
   return `hard-failure-${stepId}`;
 }
 
+/** Signals a retry of the current step; `escalated` records whether that retry followed a human
+ *  handoff (vs. a plain wait/dismiss) so the caller can thread it into the final outcome. */
+type RetrySignal = { retry: true; escalated?: boolean };
+
 async function tryErrorHandlers(
   page: Page,
   handlers: ErrorHandler[],
@@ -81,7 +85,7 @@ async function tryErrorHandlers(
   autoResume: ReplayOptions["autoResume"],
   artifact: CapabilityArtifact,
   handlerAttempts: Map<string, number>
-): Promise<ReplayOutcome | { retry: true } | null> {
+): Promise<ReplayOutcome | RetrySignal | null> {
   for (const handler of handlers) {
     // Short and deliberate: this is "is this condition true right now", not "wait for it to
     // become true" (that's what resolveStep's own timeout, above, already did). A long timeout
@@ -151,7 +155,7 @@ async function tryErrorHandlers(
       };
       const resolution = await performHandoff(controlServer, page, interventionDetails, autoResume);
       logger.log("escalation.resumed", { resumedBy: resolution.resumedBy, note: resolution.note });
-      return { retry: true };
+      return { retry: true, escalated: true };
     }
   }
   return null;
@@ -175,6 +179,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
   }
 
   const outputs: Record<string, unknown> = {};
+  let escalated = false;
 
   for (const step of artifact.steps) {
     logger.log("replay.step_start", { stepId: step.id, action: step.action });
@@ -203,7 +208,10 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
           const resolved = await resolveStep(page, step.locators);
           if (!resolved) {
             const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
-            if (outcome && "retry" in outcome) continue stepRetryLoop;
+            if (outcome && "retry" in outcome) {
+              if (outcome.escalated) escalated = true;
+              continue stepRetryLoop;
+            }
             if (outcome) return outcome;
             const screenshotPath = await debugSnapshot(page, logger, `hard-failure-${step.id}`);
             return {
@@ -211,6 +219,22 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
               message: `Could not resolve any locator for step "${step.id}".`,
               debug: { step: step.id, expected: JSON.stringify(step.locators), observed: `url=${page.url()}`, screenshotPath },
             };
+          }
+
+          if (step.action === "click" || step.action === "type" || step.action === "select") {
+            // Re-check the live target's name against the blocklist, independent of whatever
+            // riskLevel the artifact declares -- riskLevel is data baked in at recording time and
+            // can be wrong (hand-authored, or drifted); this reads what actually resolved on the
+            // live page, mirroring the same check actions.ts already applies during discovery.
+            const liveName = resolved.matchedLocator.name ?? resolved.matchedLocator.value ?? "";
+            if (isBlockedByName(liveName)) {
+              const screenshotPath = await debugSnapshot(page, logger, `blocklist-${step.id}`);
+              return {
+                status: "hard_failure",
+                message: `Blocked: "${liveName}" matches a blocked-action name pattern; refusing to replay step "${step.id}" regardless of its declared riskLevel.`,
+                debug: { step: step.id, expected: "not a blocklisted action", observed: liveName, screenshotPath },
+              };
+            }
           }
 
           if (step.riskLevel === "risky" && artifact.policy.maxRiskLevel !== "risky") {
@@ -233,6 +257,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
             logger.log("escalation.requested", { step: step.id, reason: interventionDetails.reason });
             const resolution = await performHandoff(opts.controlServer, page, interventionDetails, opts.autoResume);
             logger.log("escalation.resumed", { resumedBy: resolution.resumedBy, note: resolution.note });
+            escalated = true;
             // Risky/irreversible actions are never executed by the automation itself (see
             // riskClassifier.ts): the human performs the click live during the handoff, so we
             // move on to this step's checkpoint rather than re-attempting the action.
@@ -257,7 +282,10 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
           const ok = await checkCondition(page, step.checkpoint);
           if (!ok) {
             const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
-            if (outcome && "retry" in outcome) continue stepRetryLoop;
+            if (outcome && "retry" in outcome) {
+              if (outcome.escalated) escalated = true;
+              continue stepRetryLoop;
+            }
             if (outcome) return outcome;
             const screenshotPath = await debugSnapshot(page, logger, `hard-failure-checkpoint-${step.id}`);
             return {
@@ -274,7 +302,10 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
           return { status: "hard_failure", message: `Guardrail violation: ${err.message}`, debug: { step: step.id, expected: "allowlisted action", observed: err.message } };
         }
         const outcome = await tryErrorHandlers(page, artifact.errorHandlers, step.id, logger, runId, opts.controlServer, opts.autoResume, artifact, handlerAttempts);
-        if (outcome && "retry" in outcome) continue stepRetryLoop;
+        if (outcome && "retry" in outcome) {
+          if (outcome.escalated) escalated = true;
+          continue stepRetryLoop;
+        }
         if (outcome) return outcome;
         const screenshotPath = await debugSnapshot(page, logger, `hard-failure-exception-${step.id}`);
         return {
@@ -306,6 +337,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
       finalHandlerAttempts
     );
     if (outcome && "retry" in outcome) {
+      if (outcome.escalated) escalated = true;
       finalOk = await checkCondition(page, artifact.successCheckpoint);
       continue;
     }
@@ -321,5 +353,5 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
     };
   }
 
-  return { status: "success", outputs };
+  return { status: "success", outputs, escalated };
 }

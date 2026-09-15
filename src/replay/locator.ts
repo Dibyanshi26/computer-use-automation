@@ -4,6 +4,10 @@ import type { Locator } from "../artifact/schema.js";
 export interface ResolvedLocator {
   locator: PwLocator;
   strategyUsed: Locator["strategy"];
+  /** The specific candidate (role/name, text, or css) that resolved -- lets a caller inspect
+   *  what actually matched live, e.g. to re-check the target's name against a blocklist
+   *  independent of whatever riskLevel the artifact happens to declare for the step. */
+  matchedLocator: Locator;
 }
 
 /**
@@ -27,7 +31,7 @@ export async function resolveStep(page: Page, locators: Locator[], timeoutMs = 3
         continue;
       }
       await candidate.waitFor({ state: "visible", timeout: timeoutMs });
-      return { locator: candidate, strategyUsed: loc.strategy };
+      return { locator: candidate, strategyUsed: loc.strategy, matchedLocator: loc };
     } catch {
       continue;
     }

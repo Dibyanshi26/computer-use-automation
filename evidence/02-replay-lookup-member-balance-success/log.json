@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-09-15T15:41:39.325Z",
+    "ts": "2026-09-15T16:50:21.465Z",
     "type": "run.start",
     "capability": "lookup-member-balance",
     "inputs": {
@@ -9,101 +9,102 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-15T15:41:39.566Z",
+    "ts": "2026-09-15T16:50:21.955Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-15T15:41:39.567Z",
+    "ts": "2026-09-15T16:50:21.956Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T15:41:39.590Z",
+    "ts": "2026-09-15T16:50:21.994Z",
     "type": "replay.locator_resolved",
     "stepId": "s1",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:39.591Z",
+    "ts": "2026-09-15T16:50:21.994Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-15T15:41:39.591Z",
+    "ts": "2026-09-15T16:50:21.995Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:41:39.640Z",
+    "ts": "2026-09-15T16:50:22.049Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:39.640Z",
+    "ts": "2026-09-15T16:50:22.049Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-15T15:41:39.640Z",
+    "ts": "2026-09-15T16:50:22.050Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:41:39.704Z",
+    "ts": "2026-09-15T16:50:22.140Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:39.704Z",
+    "ts": "2026-09-15T16:50:22.140Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-15T15:41:39.704Z",
+    "ts": "2026-09-15T16:50:22.140Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "extract"
   },
   {
-    "ts": "2026-09-15T15:41:39.727Z",
+    "ts": "2026-09-15T16:50:22.165Z",
     "type": "replay.locator_resolved",
     "stepId": "s4",
     "strategy": "css"
   },
   {
-    "ts": "2026-09-15T15:41:39.727Z",
+    "ts": "2026-09-15T16:50:22.165Z",
     "type": "replay.step_done",
     "stepId": "s4"
   },
   {
-    "ts": "2026-09-15T15:41:39.727Z",
+    "ts": "2026-09-15T16:50:22.165Z",
     "type": "replay.step_start",
     "stepId": "s5",
     "action": "extract"
   },
   {
-    "ts": "2026-09-15T15:41:39.731Z",
+    "ts": "2026-09-15T16:50:22.170Z",
     "type": "replay.locator_resolved",
     "stepId": "s5",
     "strategy": "css"
   },
   {
-    "ts": "2026-09-15T15:41:39.731Z",
+    "ts": "2026-09-15T16:50:22.170Z",
     "type": "replay.step_done",
     "stepId": "s5"
   },
   {
-    "ts": "2026-09-15T15:41:39.733Z",
+    "ts": "2026-09-15T16:50:22.172Z",
     "type": "run.replay_outcome",
     "status": "success",
     "outputs": {
       "checkingBalance": "$500.00",
       "savingsBalance": "$100.00"
-    }
+    },
+    "escalated": false
   }
 ]

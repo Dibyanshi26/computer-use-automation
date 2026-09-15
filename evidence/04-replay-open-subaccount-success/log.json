@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-09-15T15:41:59.516Z",
+    "ts": "2026-09-15T16:50:24.764Z",
     "type": "run.start",
     "capability": "open-subaccount-to-confirmation",
     "inputs": {
@@ -11,160 +11,161 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-15T15:41:59.780Z",
+    "ts": "2026-09-15T16:50:24.969Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-15T15:41:59.780Z",
+    "ts": "2026-09-15T16:50:24.970Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "navigate"
   },
   {
-    "ts": "2026-09-15T15:41:59.788Z",
+    "ts": "2026-09-15T16:50:24.977Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-15T15:41:59.788Z",
+    "ts": "2026-09-15T16:50:24.977Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T15:41:59.812Z",
+    "ts": "2026-09-15T16:50:25.001Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:59.812Z",
+    "ts": "2026-09-15T16:50:25.001Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-15T15:41:59.812Z",
+    "ts": "2026-09-15T16:50:25.001Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:41:59.862Z",
+    "ts": "2026-09-15T16:50:25.051Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:59.862Z",
+    "ts": "2026-09-15T16:50:25.051Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-15T15:41:59.862Z",
+    "ts": "2026-09-15T16:50:25.051Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:41:59.926Z",
+    "ts": "2026-09-15T16:50:25.114Z",
     "type": "replay.locator_resolved",
     "stepId": "s4",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:59.926Z",
+    "ts": "2026-09-15T16:50:25.116Z",
     "type": "replay.step_done",
     "stepId": "s4"
   },
   {
-    "ts": "2026-09-15T15:41:59.926Z",
+    "ts": "2026-09-15T16:50:25.116Z",
     "type": "replay.step_start",
     "stepId": "s5",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:41:59.987Z",
+    "ts": "2026-09-15T16:50:25.175Z",
     "type": "replay.locator_resolved",
     "stepId": "s5",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:41:59.987Z",
+    "ts": "2026-09-15T16:50:25.175Z",
     "type": "replay.step_done",
     "stepId": "s5"
   },
   {
-    "ts": "2026-09-15T15:41:59.988Z",
+    "ts": "2026-09-15T16:50:25.175Z",
     "type": "replay.step_start",
     "stepId": "s6",
     "action": "select"
   },
   {
-    "ts": "2026-09-15T15:42:00.010Z",
+    "ts": "2026-09-15T16:50:25.197Z",
     "type": "replay.locator_resolved",
     "stepId": "s6",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:42:00.010Z",
+    "ts": "2026-09-15T16:50:25.197Z",
     "type": "replay.step_done",
     "stepId": "s6"
   },
   {
-    "ts": "2026-09-15T15:42:00.010Z",
+    "ts": "2026-09-15T16:50:25.197Z",
     "type": "replay.step_start",
     "stepId": "s7",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T15:42:00.015Z",
+    "ts": "2026-09-15T16:50:25.201Z",
     "type": "replay.locator_resolved",
     "stepId": "s7",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:42:00.015Z",
+    "ts": "2026-09-15T16:50:25.201Z",
     "type": "replay.step_done",
     "stepId": "s7"
   },
   {
-    "ts": "2026-09-15T15:42:00.015Z",
+    "ts": "2026-09-15T16:50:25.201Z",
     "type": "replay.step_start",
     "stepId": "s8",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T15:42:00.019Z",
+    "ts": "2026-09-15T16:50:25.206Z",
     "type": "replay.locator_resolved",
     "stepId": "s8",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:42:00.019Z",
+    "ts": "2026-09-15T16:50:25.206Z",
     "type": "replay.step_done",
     "stepId": "s8"
   },
   {
-    "ts": "2026-09-15T15:42:00.019Z",
+    "ts": "2026-09-15T16:50:25.206Z",
     "type": "replay.step_start",
     "stepId": "s9",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T15:42:00.075Z",
+    "ts": "2026-09-15T16:50:25.264Z",
     "type": "replay.locator_resolved",
     "stepId": "s9",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T15:42:00.075Z",
+    "ts": "2026-09-15T16:50:25.264Z",
     "type": "replay.step_done",
     "stepId": "s9"
   },
   {
-    "ts": "2026-09-15T15:42:00.092Z",
+    "ts": "2026-09-15T16:50:25.282Z",
     "type": "run.replay_outcome",
     "status": "success",
-    "outputs": {}
+    "outputs": {},
+    "escalated": false
   }
 ]

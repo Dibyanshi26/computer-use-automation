@@ -135,18 +135,31 @@ the resolved-strategy log line is the drift signal a human would review.
 
 ## 4. Heterogeneity & multi-tenant
 
-**Surface abstraction.** The seam is already drawn at `perceive()`
-(`src/perception/accessibilityTree.ts`, returning `{role, name, ref}` nodes) and the four
-`act*()` primitives in `src/agent/actions.ts`. Neither the discovery loop, the artifact schema,
-nor the replay engine know Playwright exists — they operate on `PerceivedNode`/`Locator`/action
-verbs. A **legacy web app** needs no new abstraction at all (that's what the mock app already is).
-A **desktop app** would mean a new `Perception`/`Action` implementation backed by an OS
-accessibility API (UI Automation on Windows, AXUIElement on macOS) instead of Playwright, emitting
-the same `PerceivedNode` shape and a `Locator` variant like `{strategy: "automationId"}` alongside
-the existing `role`/`text`/`css` ones — everything above that line (agent loop, artifact schema,
-replay engine, error taxonomy, escalation) is unchanged. That's the actual test of whether the
-abstraction is right: the replay engine's `resolveStep` already treats "locator strategy" as an
-open, ranked list, not a closed enum tied to a browser.
+**Surface abstraction.** Not built today, and I want to be precise about that rather than implying
+otherwise: `src/perception/accessibilityTree.ts`, `src/agent/actions.ts`, `src/replay/locator.ts`,
+`src/replay/checkpoint.ts`, and `src/replay/engine.ts` all `import type { Page } from "playwright"`
+and call Playwright APIs directly (`page.ariaSnapshotJSON()`, `page.getByRole`, `page.locator`,
+`page.getByText`). There is no `Perception`/`Action` interface anywhere in the codebase for a
+second implementation to satisfy. And `LocatorSchema.strategy` (`src/artifact/schema.ts`) is a
+**closed** `z.enum(["role", "text", "css"])`, resolved in `resolveStep` (`src/replay/locator.ts`)
+by a hardcoded `if/else if` over exactly those three strategies with no default/extension branch —
+adding a desktop `"automationId"` strategy would mean editing the zod schema *and* that function,
+not just dropping in a new adapter module.
+
+What *would* make it portable, concretely: (1) extract a `Perception` interface —
+`perceive(handle): Promise<PerceivedState>` — and an `Action` interface — `click/type/select(handle,
+locator)`, `extract(handle, locator)` — and have today's Playwright code become the one implementation
+of each, behind a factory keyed by surface type; (2) widen `LocatorSchema.strategy` from the closed
+enum to an open `z.string()` (or an enum plus a `z.string()` escape hatch), so a per-adapter strategy
+like `"automationId"` is a schema-valid value without a schema *version* bump; (3) make
+`resolveStep`/`checkCondition` dispatch to a per-adapter resolver keyed on `strategy` — a small
+registry (`Record<string, (handle, locator) => Promise<ResolvedTarget | null>>`) instead of the
+current inline `if/else`, so a desktop adapter registers its own `"automationId"` resolver without
+touching the Playwright one. Once that seam exists, a desktop `Perception`/`Action` pair backed by
+an OS accessibility API (UI Automation on Windows, AXUIElement on macOS) would emit the same
+`PerceivedNode` shape the agent loop already consumes, and the artifact schema, error taxonomy,
+and escalation model would be genuinely unchanged — but that's a claim about the design being
+*reachable* from here in three concrete, scoped edits, not a claim that it's already done.
 
 **Multi-tenant reuse.** `target.app` is already a logical name (`meridian-core-banking`)
 decoupled from `target.baseUrl` — the intended shape is one artifact per **vendor-app version**,
@@ -264,3 +277,33 @@ scale, not at hundreds.
   a real (non-scripted) operator console with an "act live" affordance instead of a single button;
   canonicalizing recorded values into parameterized patterns automatically instead of via an
   explicit `parameterize` map passed by the caller of `recordArtifact`.
+
+A self-audit against §3 of the brief turned up nine more, smaller things left deliberately cut
+rather than silently missing; naming them here rather than leaving them to be found again:
+**session-timeout has a fault-injector but no consuming handler** — I'd add a `session_expired`
+error handler (`urlMatches: "/login"`) to at least one capability, matching the injector already
+built for it. **"Failed load" (as opposed to slow) has neither an injector nor a handler** — I'd
+add a `?inject=fail` mode (a 5xx response) and a matching `hard_failure`-vs-`recoverable` handler
+pair to distinguish a transient failure from a permanent one. **Native browser dialogs
+(`window.confirm`/`alert`/`prompt`) are never listened for** — `page.on("dialog")` isn't registered
+anywhere, so one would be silently auto-dismissed by Playwright with no log entry; I'd add a
+listener that logs it and treats it like any other unexpected interstitial. **Intermediate tool
+calls carry no reasoning field** — only `finish`/`request_help` have a `reason` parameter in
+`prompts.ts`; I'd add an optional `reason` to `click`/`type`/`select`/`navigate`/`extract` and log
+it, so the structured log captures why, not just what, for every step. **Three of eleven replay
+`hard_failure` return sites don't take a screenshot** (input-validation, the origin-guardrail
+check, and the mid-step `GuardrailViolation` catch in `engine.ts`) — I'd add `debugSnapshot` calls
+at those three. **`auth.ts`'s `login()` bypasses the allowlist** (`page.goto` with no
+`assertUrlAllowed` check) — low practical risk since the URL is fixed and env-derived, not
+LLM-controlled, but not actually gated; I'd route it through the same check for consistency.
+**`schemaVersion` is a bare `z.literal("1.0")` with no dispatch** — a hypothetical 2.0 artifact
+just fails `.parse()` with a generic Zod error; I'd check `raw.schemaVersion` before parsing and
+throw a specific "unsupported schema version" error as a first step toward real migration support.
+**Redaction is keyed on JSON field name, not on what UI field a value came from** — a `type`
+action always logs as `{ref, text}`, so a value typed into a live password-*labeled* control
+wouldn't be redacted (the key is `text`, not `password`); I'd pass the target element's accessible
+name into the log call and redact by that, not just by the argument's own key. **Dead-end/repeated-
+state detection in discovery is prompt-only** — `SYSTEM_PROMPT` tells the model to call
+`request_help` if the same state repeats, but nothing in `discoveryLoop.ts` actually hashes and
+compares consecutive perceived states; I'd add a simple repeat counter as a code-level backstop
+for when the model doesn't notice on its own.

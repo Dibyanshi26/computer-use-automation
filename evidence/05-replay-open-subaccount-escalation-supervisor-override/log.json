@@ -1,11 +1,11 @@
 [
   {
-    "ts": "2026-09-15T16:23:30.873Z",
+    "ts": "2026-09-15T16:50:34.625Z",
     "type": "escalation.control_server_started",
     "url": "http://localhost:4100"
   },
   {
-    "ts": "2026-09-15T16:23:30.874Z",
+    "ts": "2026-09-15T16:50:34.625Z",
     "type": "run.start",
     "capability": "open-subaccount-to-confirmation",
     "inputs": {
@@ -16,96 +16,96 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-15T16:23:31.128Z",
+    "ts": "2026-09-15T16:50:34.996Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-15T16:23:31.129Z",
+    "ts": "2026-09-15T16:50:34.998Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "navigate"
   },
   {
-    "ts": "2026-09-15T16:23:31.137Z",
+    "ts": "2026-09-15T16:50:35.010Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-15T16:23:31.137Z",
+    "ts": "2026-09-15T16:50:35.010Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T16:23:31.160Z",
+    "ts": "2026-09-15T16:50:35.055Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:31.160Z",
+    "ts": "2026-09-15T16:50:35.056Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-15T16:23:31.160Z",
+    "ts": "2026-09-15T16:50:35.056Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T16:23:31.211Z",
+    "ts": "2026-09-15T16:50:35.128Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:31.211Z",
+    "ts": "2026-09-15T16:50:35.128Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-15T16:23:31.211Z",
+    "ts": "2026-09-15T16:50:35.128Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T16:23:31.273Z",
+    "ts": "2026-09-15T16:50:35.199Z",
     "type": "replay.locator_resolved",
     "stepId": "s4",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:31.274Z",
+    "ts": "2026-09-15T16:50:35.200Z",
     "type": "replay.step_done",
     "stepId": "s4"
   },
   {
-    "ts": "2026-09-15T16:23:31.274Z",
+    "ts": "2026-09-15T16:50:35.200Z",
     "type": "replay.step_start",
     "stepId": "s5",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T16:23:31.333Z",
+    "ts": "2026-09-15T16:50:35.265Z",
     "type": "replay.locator_resolved",
     "stepId": "s5",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:31.333Z",
+    "ts": "2026-09-15T16:50:35.265Z",
     "type": "replay.step_done",
     "stepId": "s5"
   },
   {
-    "ts": "2026-09-15T16:23:31.333Z",
+    "ts": "2026-09-15T16:50:35.265Z",
     "type": "replay.step_start",
     "stepId": "s6",
     "action": "select"
   },
   {
-    "ts": "2026-09-15T16:23:35.149Z",
+    "ts": "2026-09-15T16:50:39.113Z",
     "type": "replay.error_handler_matched",
     "code": "supervisor_approval_required",
     "outcome": "escalate",
@@ -113,28 +113,28 @@
     "screenshotPath": "screenshots/escalation-s6.png"
   },
   {
-    "ts": "2026-09-15T16:23:35.149Z",
+    "ts": "2026-09-15T16:50:39.113Z",
     "type": "escalation.requested",
     "step": "s6",
     "reason": "Member is flagged for manager review; supervisor override required before opening a sub-account."
   },
   {
-    "ts": "2026-09-15T16:23:35.150Z",
+    "ts": "2026-09-15T16:50:39.114Z",
     "type": "control.transferred",
     "holder": "human",
     "who": "pending",
-    "since": "2026-09-15T16:23:35.150Z",
+    "since": "2026-09-15T16:50:39.114Z",
     "previousHolder": "automation",
     "stepId": "s6",
     "reason": "Member is flagged for manager review; supervisor override required before opening a sub-account."
   },
   {
-    "ts": "2026-09-15T16:23:35.150Z",
+    "ts": "2026-09-15T16:50:39.114Z",
     "type": "escalation.auto_resume_stand_in",
     "reason": "Member is flagged for manager review; supervisor override required before opening a sub-account."
   },
   {
-    "ts": "2026-09-15T16:23:35.201Z",
+    "ts": "2026-09-15T16:50:39.157Z",
     "type": "human.action",
     "source": "request",
     "stepId": "s6",
@@ -142,18 +142,18 @@
     "method": "POST"
   },
   {
-    "ts": "2026-09-15T16:23:35.206Z",
+    "ts": "2026-09-15T16:50:39.182Z",
     "type": "human.action",
     "source": "framenavigated",
     "stepId": "s6",
     "url": "http://localhost:4000/member/10003/open-subaccount/override"
   },
   {
-    "ts": "2026-09-15T16:23:35.246Z",
+    "ts": "2026-09-15T16:50:39.242Z",
     "type": "control.transferred",
     "holder": "automation",
     "who": "automation",
-    "since": "2026-09-15T16:23:35.246Z",
+    "since": "2026-09-15T16:50:39.242Z",
     "previousHolder": "human",
     "resumedBy": "scripted-operator-stand-in",
     "note": "Automated stand-in for evidence reproducibility; see README.",
@@ -161,77 +161,78 @@
     "screenshotPath": "screenshots/post-handoff-s6.png"
   },
   {
-    "ts": "2026-09-15T16:23:35.246Z",
+    "ts": "2026-09-15T16:50:39.242Z",
     "type": "escalation.resumed",
     "resumedBy": "scripted-operator-stand-in",
     "note": "Automated stand-in for evidence reproducibility; see README."
   },
   {
-    "ts": "2026-09-15T16:23:35.267Z",
+    "ts": "2026-09-15T16:50:39.277Z",
     "type": "replay.locator_resolved",
     "stepId": "s6",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:35.267Z",
+    "ts": "2026-09-15T16:50:39.277Z",
     "type": "replay.step_done",
     "stepId": "s6"
   },
   {
-    "ts": "2026-09-15T16:23:35.267Z",
+    "ts": "2026-09-15T16:50:39.277Z",
     "type": "replay.step_start",
     "stepId": "s7",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T16:23:35.272Z",
+    "ts": "2026-09-15T16:50:39.285Z",
     "type": "replay.locator_resolved",
     "stepId": "s7",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:35.272Z",
+    "ts": "2026-09-15T16:50:39.285Z",
     "type": "replay.step_done",
     "stepId": "s7"
   },
   {
-    "ts": "2026-09-15T16:23:35.272Z",
+    "ts": "2026-09-15T16:50:39.285Z",
     "type": "replay.step_start",
     "stepId": "s8",
     "action": "type"
   },
   {
-    "ts": "2026-09-15T16:23:35.277Z",
+    "ts": "2026-09-15T16:50:39.295Z",
     "type": "replay.locator_resolved",
     "stepId": "s8",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:35.277Z",
+    "ts": "2026-09-15T16:50:39.295Z",
     "type": "replay.step_done",
     "stepId": "s8"
   },
   {
-    "ts": "2026-09-15T16:23:35.277Z",
+    "ts": "2026-09-15T16:50:39.295Z",
     "type": "replay.step_start",
     "stepId": "s9",
     "action": "click"
   },
   {
-    "ts": "2026-09-15T16:23:35.337Z",
+    "ts": "2026-09-15T16:50:39.401Z",
     "type": "replay.locator_resolved",
     "stepId": "s9",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-15T16:23:35.337Z",
+    "ts": "2026-09-15T16:50:39.402Z",
     "type": "replay.step_done",
     "stepId": "s9"
   },
   {
-    "ts": "2026-09-15T16:23:35.365Z",
+    "ts": "2026-09-15T16:50:39.444Z",
     "type": "run.replay_outcome",
     "status": "success",
-    "outputs": {}
+    "outputs": {},
+    "escalated": true
   }
 ]
