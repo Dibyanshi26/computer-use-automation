@@ -1,104 +1,92 @@
 [
   {
-    "ts": "2026-09-14T20:24:44.036Z",
+    "ts": "2026-09-15T15:40:20.226Z",
     "type": "run.start",
     "capability": "lookup-member-balance",
-    "memberId": "10001",
+    "params": {
+      "memberId": "10001"
+    },
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-14T20:24:44.272Z",
+    "ts": "2026-09-15T15:40:20.485Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-14T20:24:46.278Z",
-    "type": "agent.tool_call",
-    "name": "navigate",
-    "arguments": {
-      "url": "http://localhost:4000/search"
-    }
-  },
-  {
-    "ts": "2026-09-14T20:24:46.300Z",
-    "type": "agent.tool_result",
-    "name": "navigate",
-    "result": "Navigated to http://localhost:4000/search."
-  },
-  {
-    "ts": "2026-09-14T20:24:47.718Z",
+    "ts": "2026-09-15T15:40:23.935Z",
     "type": "agent.tool_call",
     "name": "type",
     "arguments": {
-      "ref": "n4",
+      "ref": "n28",
       "text": "10001"
     }
   },
   {
-    "ts": "2026-09-14T20:24:47.736Z",
+    "ts": "2026-09-15T15:40:23.954Z",
     "type": "agent.tool_result",
     "name": "type",
     "result": "Typed into \"Member ID or name\"."
   },
   {
-    "ts": "2026-09-14T20:24:49.050Z",
+    "ts": "2026-09-15T15:40:25.466Z",
     "type": "agent.tool_call",
     "name": "click",
     "arguments": {
-      "ref": "n7"
+      "ref": "n31"
     }
   },
   {
-    "ts": "2026-09-14T20:24:49.096Z",
+    "ts": "2026-09-15T15:40:25.533Z",
     "type": "agent.tool_result",
     "name": "click",
     "result": "Clicked \"Search\"."
   },
   {
-    "ts": "2026-09-14T20:24:50.075Z",
+    "ts": "2026-09-15T15:40:26.637Z",
     "type": "agent.tool_call",
     "name": "click",
     "arguments": {
-      "ref": "n13"
+      "ref": "n37"
     }
   },
   {
-    "ts": "2026-09-14T20:24:50.112Z",
+    "ts": "2026-09-15T15:40:26.665Z",
     "type": "agent.tool_result",
     "name": "click",
     "result": "Clicked \"View\"."
   },
   {
-    "ts": "2026-09-14T20:24:52.400Z",
+    "ts": "2026-09-15T15:40:28.072Z",
     "type": "agent.tool_call",
     "name": "extract",
     "arguments": {
-      "ref": "n8",
+      "ref": "n32",
       "outputName": "checkingBalance"
     }
   },
   {
-    "ts": "2026-09-14T20:24:52.437Z",
+    "ts": "2026-09-15T15:40:28.111Z",
     "type": "agent.tool_result",
     "name": "extract",
     "result": "Extracted \"$2340.12\" -> checkingBalance = \"$2340.12\""
   },
   {
-    "ts": "2026-09-14T20:24:53.302Z",
+    "ts": "2026-09-15T15:40:29.422Z",
     "type": "agent.tool_call",
     "name": "extract",
     "arguments": {
-      "ref": "n10",
+      "ref": "n34",
       "outputName": "savingsBalance"
     }
   },
   {
-    "ts": "2026-09-14T20:24:53.318Z",
+    "ts": "2026-09-15T15:40:29.432Z",
     "type": "agent.tool_result",
     "name": "extract",
     "result": "Extracted \"$15200.55\" -> savingsBalance = \"$15200.55\""
   },
   {
-    "ts": "2026-09-14T20:24:54.543Z",
+    "ts": "2026-09-15T15:40:30.941Z",
     "type": "agent.tool_call",
     "name": "finish",
     "arguments": {
@@ -111,7 +99,7 @@
     }
   },
   {
-    "ts": "2026-09-14T20:24:54.543Z",
+    "ts": "2026-09-15T15:40:30.942Z",
     "type": "agent.finish",
     "success": true,
     "outputs": {
@@ -121,7 +109,7 @@
     "reason": "Successfully retrieved the checking and savings balances for member 10001."
   },
   {
-    "ts": "2026-09-14T20:24:54.543Z",
+    "ts": "2026-09-15T15:40:30.942Z",
     "type": "run.discovery_result",
     "success": true,
     "outputs": {
@@ -129,11 +117,6 @@
       "savingsBalance": "$15200.55"
     },
     "trace": [
-      {
-        "action": "navigate",
-        "value": "http://localhost:4000/search",
-        "urlAfter": "http://localhost:4000/search"
-      },
       {
         "action": "type",
         "resolvedLocator": {
@@ -165,7 +148,7 @@
           "role": "cell",
           "name": "$2340.12"
         },
-        "structuralLocatorCss": "tr:has-text(\"Checking Balance\") td:nth-of-type(2)",
+        "structuralLocatorCss": "tr:has-text(\"Checking Balance\"):not(:has(table)) td:nth-of-type(2)",
         "outputName": "checkingBalance",
         "urlAfter": "http://localhost:4000/member/10001"
       },
@@ -175,7 +158,7 @@
           "role": "cell",
           "name": "$15200.55"
         },
-        "structuralLocatorCss": "tr:has-text(\"Savings Balance\") td:nth-of-type(2)",
+        "structuralLocatorCss": "tr:has-text(\"Savings Balance\"):not(:has(table)) td:nth-of-type(2)",
         "outputName": "savingsBalance",
         "urlAfter": "http://localhost:4000/member/10001"
       }

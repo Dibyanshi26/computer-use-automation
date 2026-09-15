@@ -140,8 +140,8 @@
     "maxRiskLevel": "safe"
   },
   "provenance": {
-    "createdFromRunId": "discovery-1789419397735",
-    "createdAt": "2026-09-14T20:56:46.202Z",
+    "createdFromRunId": "discovery-1789486953041",
+    "createdAt": "2026-09-15T15:42:45.039Z",
     "discoveredBy": "gpt-4o"
   }
 }

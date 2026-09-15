@@ -31,13 +31,6 @@
   "steps": [
     {
       "id": "s1",
-      "action": "navigate",
-      "locators": [],
-      "value": "http://localhost:4000/search",
-      "riskLevel": "safe"
-    },
-    {
-      "id": "s2",
       "action": "type",
       "locators": [
         {
@@ -50,7 +43,7 @@
       "riskLevel": "safe"
     },
     {
-      "id": "s3",
+      "id": "s2",
       "action": "click",
       "locators": [
         {
@@ -62,7 +55,7 @@
       "riskLevel": "safe"
     },
     {
-      "id": "s4",
+      "id": "s3",
       "action": "click",
       "locators": [
         {
@@ -74,12 +67,12 @@
       "riskLevel": "safe"
     },
     {
-      "id": "s5",
+      "id": "s4",
       "action": "extract",
       "locators": [
         {
           "strategy": "css",
-          "value": "tr:has-text(\"Checking Balance\") td:nth-of-type(2)"
+          "value": "tr:has-text(\"Checking Balance\"):not(:has(table)) td:nth-of-type(2)"
         },
         {
           "strategy": "role",
@@ -91,12 +84,12 @@
       "riskLevel": "safe"
     },
     {
-      "id": "s6",
+      "id": "s5",
       "action": "extract",
       "locators": [
         {
           "strategy": "css",
-          "value": "tr:has-text(\"Savings Balance\") td:nth-of-type(2)"
+          "value": "tr:has-text(\"Savings Balance\"):not(:has(table)) td:nth-of-type(2)"
         },
         {
           "strategy": "role",
@@ -130,8 +123,8 @@
     "maxRiskLevel": "safe"
   },
   "provenance": {
-    "createdFromRunId": "discovery-1789417484036",
-    "createdAt": "2026-09-14T20:24:54.544Z",
+    "createdFromRunId": "discovery-1789486820225",
+    "createdAt": "2026-09-15T15:40:30.943Z",
     "discoveredBy": "gpt-4o"
   }
 }

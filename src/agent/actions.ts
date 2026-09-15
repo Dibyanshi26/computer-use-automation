@@ -31,6 +31,17 @@ export interface ActionOutcome {
  * label/value table markup the value is reliably the row's 2nd cell, so we anchor on the
  * adjacent, run-invariant label cell instead ("Checking Balance" -> its sibling cell) and use
  * that as the primary locator, falling back to the literal value match only as a last resort.
+ *
+ * `:has-text()` matches an element if the given text appears ANYWHERE in its own text content,
+ * ancestors included -- so on a page whose chrome nests the real content several tables deep
+ * (layout wrapper tables around a panel around the actual data table, all legitimate in a
+ * legacy-app-style UI), a bare `tr:has-text("Checking Balance")` also matches every wrapper
+ * <tr> between the label row and the document root, and unioning in `td:nth-of-type(2)` as a
+ * descendant then matches every sibling row's 2nd cell within those wrappers too -- `.first()`
+ * can land on a completely unrelated cell (verified: it landed on the Member ID cell instead of
+ * the balance). `:not(:has(table))` excludes any <tr> that itself contains a nested table --
+ * true of every layout-wrapper row, false of an actual leaf label/value row -- which keeps the
+ * match to just the one row we mean regardless of how deep it's nested.
  */
 async function computeRowLabelLocatorCss(locator: ReturnType<Page["getByRole"]>): Promise<string | null> {
   const label = await locator
@@ -42,7 +53,7 @@ async function computeRowLabelLocatorCss(locator: ReturnType<Page["getByRole"]>)
     .catch(() => null);
   if (!label) return null;
   const escaped = label.replace(/"/g, '\\"');
-  return `tr:has-text("${escaped}") td:nth-of-type(2)`;
+  return `tr:has-text("${escaped}"):not(:has(table)) td:nth-of-type(2)`;
 }
 
 export interface ActionContext {

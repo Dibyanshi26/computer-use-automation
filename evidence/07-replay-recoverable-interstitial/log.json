@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-09-14T20:41:01.111Z",
+    "ts": "2026-09-15T15:42:15.831Z",
     "type": "run.start",
     "capability": "open-subaccount-to-confirmation",
     "inputs": {
@@ -11,28 +11,28 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-14T20:41:01.285Z",
+    "ts": "2026-09-15T15:42:15.995Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-14T20:41:01.286Z",
+    "ts": "2026-09-15T15:42:15.996Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "navigate"
   },
   {
-    "ts": "2026-09-14T20:41:01.294Z",
+    "ts": "2026-09-15T15:42:16.005Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-14T20:41:01.294Z",
+    "ts": "2026-09-15T15:42:16.005Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:41:04.600Z",
+    "ts": "2026-09-15T15:42:19.312Z",
     "type": "replay.error_handler_matched",
     "code": "session_notice_interstitial",
     "outcome": "recoverable",
@@ -40,143 +40,143 @@
     "screenshotPath": "screenshots/recovery-dismiss-s2.png"
   },
   {
-    "ts": "2026-09-14T20:41:04.604Z",
+    "ts": "2026-09-15T15:42:19.315Z",
     "type": "replay.recovery_dismiss",
     "code": "session_notice_interstitial",
     "attempt": 1
   },
   {
-    "ts": "2026-09-14T20:41:04.660Z",
+    "ts": "2026-09-15T15:42:19.384Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.661Z",
+    "ts": "2026-09-15T15:42:19.384Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-14T20:41:04.661Z",
+    "ts": "2026-09-15T15:42:19.384Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:41:04.712Z",
+    "ts": "2026-09-15T15:42:19.438Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.712Z",
+    "ts": "2026-09-15T15:42:19.438Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-14T20:41:04.712Z",
+    "ts": "2026-09-15T15:42:19.438Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:41:04.771Z",
+    "ts": "2026-09-15T15:42:19.499Z",
     "type": "replay.locator_resolved",
     "stepId": "s4",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.771Z",
+    "ts": "2026-09-15T15:42:19.499Z",
     "type": "replay.step_done",
     "stepId": "s4"
   },
   {
-    "ts": "2026-09-14T20:41:04.771Z",
+    "ts": "2026-09-15T15:42:19.499Z",
     "type": "replay.step_start",
     "stepId": "s5",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:41:04.835Z",
+    "ts": "2026-09-15T15:42:19.558Z",
     "type": "replay.locator_resolved",
     "stepId": "s5",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.835Z",
+    "ts": "2026-09-15T15:42:19.558Z",
     "type": "replay.step_done",
     "stepId": "s5"
   },
   {
-    "ts": "2026-09-14T20:41:04.835Z",
+    "ts": "2026-09-15T15:42:19.558Z",
     "type": "replay.step_start",
     "stepId": "s6",
     "action": "select"
   },
   {
-    "ts": "2026-09-14T20:41:04.857Z",
+    "ts": "2026-09-15T15:42:19.580Z",
     "type": "replay.locator_resolved",
     "stepId": "s6",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.857Z",
+    "ts": "2026-09-15T15:42:19.580Z",
     "type": "replay.step_done",
     "stepId": "s6"
   },
   {
-    "ts": "2026-09-14T20:41:04.857Z",
+    "ts": "2026-09-15T15:42:19.580Z",
     "type": "replay.step_start",
     "stepId": "s7",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:41:04.863Z",
+    "ts": "2026-09-15T15:42:19.585Z",
     "type": "replay.locator_resolved",
     "stepId": "s7",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.863Z",
+    "ts": "2026-09-15T15:42:19.585Z",
     "type": "replay.step_done",
     "stepId": "s7"
   },
   {
-    "ts": "2026-09-14T20:41:04.863Z",
+    "ts": "2026-09-15T15:42:19.585Z",
     "type": "replay.step_start",
     "stepId": "s8",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:41:04.868Z",
+    "ts": "2026-09-15T15:42:19.590Z",
     "type": "replay.locator_resolved",
     "stepId": "s8",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.868Z",
+    "ts": "2026-09-15T15:42:19.590Z",
     "type": "replay.step_done",
     "stepId": "s8"
   },
   {
-    "ts": "2026-09-14T20:41:04.868Z",
+    "ts": "2026-09-15T15:42:19.590Z",
     "type": "replay.step_start",
     "stepId": "s9",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:41:04.926Z",
+    "ts": "2026-09-15T15:42:19.647Z",
     "type": "replay.locator_resolved",
     "stepId": "s9",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:41:04.926Z",
+    "ts": "2026-09-15T15:42:19.647Z",
     "type": "replay.step_done",
     "stepId": "s9"
   },
   {
-    "ts": "2026-09-14T20:41:04.944Z",
+    "ts": "2026-09-15T15:42:19.664Z",
     "type": "run.replay_outcome",
     "status": "success",
     "outputs": {}

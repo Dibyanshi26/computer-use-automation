@@ -1,11 +1,11 @@
 [
   {
-    "ts": "2026-09-14T20:25:15.996Z",
+    "ts": "2026-09-15T15:42:02.342Z",
     "type": "escalation.control_server_started",
     "url": "http://localhost:4100"
   },
   {
-    "ts": "2026-09-14T20:25:15.997Z",
+    "ts": "2026-09-15T15:42:02.343Z",
     "type": "run.start",
     "capability": "open-subaccount-to-confirmation",
     "inputs": {
@@ -16,182 +16,183 @@
     "baseUrl": "http://localhost:4000"
   },
   {
-    "ts": "2026-09-14T20:25:16.150Z",
+    "ts": "2026-09-15T15:42:02.509Z",
     "type": "auth.login_complete"
   },
   {
-    "ts": "2026-09-14T20:25:16.151Z",
+    "ts": "2026-09-15T15:42:02.510Z",
     "type": "replay.step_start",
     "stepId": "s1",
     "action": "navigate"
   },
   {
-    "ts": "2026-09-14T20:25:16.158Z",
+    "ts": "2026-09-15T15:42:02.517Z",
     "type": "replay.step_done",
     "stepId": "s1"
   },
   {
-    "ts": "2026-09-14T20:25:16.158Z",
+    "ts": "2026-09-15T15:42:02.517Z",
     "type": "replay.step_start",
     "stepId": "s2",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:25:16.181Z",
+    "ts": "2026-09-15T15:42:02.541Z",
     "type": "replay.locator_resolved",
     "stepId": "s2",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:16.181Z",
+    "ts": "2026-09-15T15:42:02.541Z",
     "type": "replay.step_done",
     "stepId": "s2"
   },
   {
-    "ts": "2026-09-14T20:25:16.181Z",
+    "ts": "2026-09-15T15:42:02.541Z",
     "type": "replay.step_start",
     "stepId": "s3",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:25:16.232Z",
+    "ts": "2026-09-15T15:42:02.590Z",
     "type": "replay.locator_resolved",
     "stepId": "s3",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:16.232Z",
+    "ts": "2026-09-15T15:42:02.590Z",
     "type": "replay.step_done",
     "stepId": "s3"
   },
   {
-    "ts": "2026-09-14T20:25:16.232Z",
+    "ts": "2026-09-15T15:42:02.590Z",
     "type": "replay.step_start",
     "stepId": "s4",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:25:16.295Z",
+    "ts": "2026-09-15T15:42:02.651Z",
     "type": "replay.locator_resolved",
     "stepId": "s4",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:16.296Z",
+    "ts": "2026-09-15T15:42:02.652Z",
     "type": "replay.step_done",
     "stepId": "s4"
   },
   {
-    "ts": "2026-09-14T20:25:16.296Z",
+    "ts": "2026-09-15T15:42:02.652Z",
     "type": "replay.step_start",
     "stepId": "s5",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:25:16.354Z",
+    "ts": "2026-09-15T15:42:02.710Z",
     "type": "replay.locator_resolved",
     "stepId": "s5",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:16.354Z",
+    "ts": "2026-09-15T15:42:02.710Z",
     "type": "replay.step_done",
     "stepId": "s5"
   },
   {
-    "ts": "2026-09-14T20:25:16.354Z",
+    "ts": "2026-09-15T15:42:02.710Z",
     "type": "replay.step_start",
     "stepId": "s6",
     "action": "select"
   },
   {
-    "ts": "2026-09-14T20:25:20.123Z",
+    "ts": "2026-09-15T15:42:06.508Z",
     "type": "replay.error_handler_matched",
     "code": "supervisor_approval_required",
     "outcome": "escalate",
-    "step": "s6"
+    "step": "s6",
+    "screenshotPath": "screenshots/escalation-s6.png"
   },
   {
-    "ts": "2026-09-14T20:25:20.157Z",
+    "ts": "2026-09-15T15:42:06.508Z",
     "type": "escalation.requested",
     "step": "s6",
     "reason": "Member is flagged for manager review; supervisor override required before opening a sub-account."
   },
   {
-    "ts": "2026-09-14T20:25:20.157Z",
+    "ts": "2026-09-15T15:42:06.508Z",
     "type": "escalation.auto_resume_stand_in",
     "reason": "Member is flagged for manager review; supervisor override required before opening a sub-account."
   },
   {
-    "ts": "2026-09-14T20:25:20.209Z",
+    "ts": "2026-09-15T15:42:06.566Z",
     "type": "escalation.resumed",
     "resumedBy": "scripted-operator-stand-in",
     "note": "Automated stand-in for evidence reproducibility; see README."
   },
   {
-    "ts": "2026-09-14T20:25:20.232Z",
+    "ts": "2026-09-15T15:42:06.590Z",
     "type": "replay.locator_resolved",
     "stepId": "s6",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:20.232Z",
+    "ts": "2026-09-15T15:42:06.590Z",
     "type": "replay.step_done",
     "stepId": "s6"
   },
   {
-    "ts": "2026-09-14T20:25:20.232Z",
+    "ts": "2026-09-15T15:42:06.590Z",
     "type": "replay.step_start",
     "stepId": "s7",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:25:20.236Z",
+    "ts": "2026-09-15T15:42:06.598Z",
     "type": "replay.locator_resolved",
     "stepId": "s7",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:20.236Z",
+    "ts": "2026-09-15T15:42:06.598Z",
     "type": "replay.step_done",
     "stepId": "s7"
   },
   {
-    "ts": "2026-09-14T20:25:20.236Z",
+    "ts": "2026-09-15T15:42:06.598Z",
     "type": "replay.step_start",
     "stepId": "s8",
     "action": "type"
   },
   {
-    "ts": "2026-09-14T20:25:20.240Z",
+    "ts": "2026-09-15T15:42:06.603Z",
     "type": "replay.locator_resolved",
     "stepId": "s8",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:20.240Z",
+    "ts": "2026-09-15T15:42:06.604Z",
     "type": "replay.step_done",
     "stepId": "s8"
   },
   {
-    "ts": "2026-09-14T20:25:20.240Z",
+    "ts": "2026-09-15T15:42:06.604Z",
     "type": "replay.step_start",
     "stepId": "s9",
     "action": "click"
   },
   {
-    "ts": "2026-09-14T20:25:20.286Z",
+    "ts": "2026-09-15T15:42:06.658Z",
     "type": "replay.locator_resolved",
     "stepId": "s9",
     "strategy": "role"
   },
   {
-    "ts": "2026-09-14T20:25:20.286Z",
+    "ts": "2026-09-15T15:42:06.658Z",
     "type": "replay.step_done",
     "stepId": "s9"
   },
   {
-    "ts": "2026-09-14T20:25:20.303Z",
+    "ts": "2026-09-15T15:42:06.676Z",
     "type": "run.replay_outcome",
     "status": "success",
     "outputs": {}
