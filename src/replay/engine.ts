@@ -38,6 +38,29 @@ async function debugSnapshot(page: Page, logger: RunLogger, label: string): Prom
   return logger.screenshot(page, label);
 }
 
+/**
+ * Raises the intervention and returns once control is back with automation -- via the real
+ * operator console's POST /resume, or (if autoResume is set) the scripted stand-in. Both go
+ * through ControlServer.resume() identically: the stand-in performs its action(s) on the live
+ * page and then calls resume() itself rather than short-circuiting the handoff, so its clicks
+ * pass through the same human.action recording and control.transferred logging a real operator's
+ * would, and there is no second, shorter path back to automation.
+ */
+async function performHandoff(
+  controlServer: ControlServer,
+  page: Page,
+  interventionDetails: Omit<InterventionRequest, "createdAt">,
+  autoResume: ReplayOptions["autoResume"]
+): Promise<ResumeSignal> {
+  const resumePromise = controlServer.requestIntervention(page, interventionDetails);
+  if (autoResume) {
+    autoResume(page, { ...interventionDetails, createdAt: new Date().toISOString() }).then((resolution) =>
+      controlServer.resume(resolution.resumedBy, resolution.note)
+    );
+  }
+  return resumePromise;
+}
+
 const RECOVERABLE_RETRY_WAIT_MS = 1200;
 
 /** e.g. "business-outcome-member_not_found-s4", "recovery-dismiss-s2", "escalation-s6". */
@@ -126,10 +149,7 @@ async function tryErrorHandlers(
         reason: handler.message,
         screenshotFile: `${logger.runDir}/${screenshotPath}`,
       };
-      const resumePromise = controlServer.requestIntervention(interventionDetails);
-      const resolution = autoResume
-        ? await autoResume(page, { ...interventionDetails, createdAt: new Date().toISOString() })
-        : await resumePromise;
+      const resolution = await performHandoff(controlServer, page, interventionDetails, autoResume);
       logger.log("escalation.resumed", { resumedBy: resolution.resumedBy, note: resolution.note });
       return { retry: true };
     }
@@ -211,10 +231,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayOutcome> {
               screenshotFile: `${logger.runDir}/${screenshotPath}`,
             };
             logger.log("escalation.requested", { step: step.id, reason: interventionDetails.reason });
-            const resumePromise = opts.controlServer.requestIntervention(interventionDetails);
-            const resolution = opts.autoResume
-              ? await opts.autoResume(page, { ...interventionDetails, createdAt: new Date().toISOString() })
-              : await resumePromise;
+            const resolution = await performHandoff(opts.controlServer, page, interventionDetails, opts.autoResume);
             logger.log("escalation.resumed", { resumedBy: resolution.resumedBy, note: resolution.note });
             // Risky/irreversible actions are never executed by the automation itself (see
             // riskClassifier.ts): the human performs the click live during the handoff, so we

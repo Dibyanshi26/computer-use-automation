@@ -87,7 +87,8 @@ describe("replay engine", () => {
     };
     artifact.target.baseUrl = BASE_URL;
 
-    const controlServer = new ControlServer(4502);
+    const logger = testLogger("risky-escalation");
+    const controlServer = new ControlServer(logger, 4502);
     await controlServer.start();
     let escalationSeen = false;
     const autoResume = async (p: Page, intervention: InterventionRequest): Promise<ResumeSignal> => {
@@ -102,7 +103,7 @@ describe("replay engine", () => {
       artifact,
       inputs: { memberId: "10002", depositAmount: 100, nickname: "Test" },
       page,
-      logger: testLogger("risky-escalation"),
+      logger,
       runId: "t4",
       controlServer,
       autoResume,
@@ -111,6 +112,15 @@ describe("replay engine", () => {
 
     expect(escalationSeen).toBe(true);
     expect(outcome.status).toBe("success");
+
+    logger.finalize({ status: outcome.status });
+    const events = JSON.parse(fs.readFileSync(`${logger.runDir}/log.json`, "utf-8"));
+    const transfers = events.filter((e: any) => e.type === "control.transferred");
+    expect(transfers.map((e: any) => e.holder)).toEqual(["human", "automation"]);
+    expect(transfers[1].resumedBy).toBe("test-operator");
+    // The auto-resume stand-in's own click on the live page is expected to surface as a
+    // human.action event, exactly as a real operator's click would -- it is not special-cased.
+    expect(events.some((e: any) => e.type === "human.action")).toBe(true);
   });
 
   it("recovers from an unexpected interstitial by dismissing it, then continues (recovery: dismiss)", async () => {

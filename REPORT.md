@@ -178,13 +178,37 @@ screenshot) and posts `/resume` when done. Because everything runs in one proces
 action and the automation's next action operate on the identical `Page` object — there's no
 session re-creation, no cookie hand-off, no state to lose.
 
-**Handing control back**: two distinct resume semantics, matched to the trigger: after an
-`escalate` error handler (the human changed page state, e.g. clicked "Override"), the engine
-**retries the same step** — the control it needed should now exist. After a risky-action policy
-block, the engine assumes the human performed the click themselves live and instead **moves on**
-to the step's checkpoint — the automation never re-attempts an irreversible action after a human
-was just shown it. Both paths are logged (`escalation.requested` / `escalation.resumed`, with
-`resumedBy`) as part of the run's evidence.
+**Control-transfer state machine**: exactly two states, `"automation"` and `"human"`
+(`ControlServer`'s `ControlState = {holder, who, since}`), live at `GET /control` and rendered on
+the operator console. `requestIntervention()` is the only way into `"human"`: it flips the state,
+attaches `page.on("framenavigated")` and a `page.on("request")` filter (navigations and POST
+requests — form submissions) to the live page, and logs a `control.transferred` event carrying
+the new state, the step, and why. `resume()` is the only way back to `"automation"`, and it is a
+single choke point both paths go through identically: the real operator console's `POST /resume`
+calls it, and so does `--auto-resume`'s scripted stand-in, which performs its click on the live
+page and then calls `resume()` itself rather than returning a resolution directly — so its clicks
+get exactly the same `human.action` recording a real operator's would, unspecial-cased (see
+`evidence/05-*`, whose log shows both transitions and the stand-in's own click recorded as a
+human action). `resume()` detaches the listeners *first* — before anything else — so nothing
+automation does after resuming can be misattributed as a human action; then it captures a
+`post-handoff-<step>` screenshot and the URL the human left the session on, flips the state, and
+logs a second `control.transferred` event carrying who resumed, where they left it, and that
+screenshot's path.
+
+**Recording what the human did**: while control is held by `"human"`, every `framenavigated` and
+every matching `request` on the live page becomes a `human.action` log event (source, URL,
+method). This is coarse — it's not a DOM diff or a replay of individual clicks — but it's a real
+signal from the actual browser the human (or stand-in) was driving, not a description of intent.
+
+**Handing control back — two distinct resume semantics for the *engine's* control flow**, on top
+of the state machine above, matched to the trigger: after an `escalate` error handler (the human
+changed page state, e.g. clicked "Override"), the engine **retries the same step** — the control
+it needed should now exist. After a risky-action policy block, the engine assumes the human
+performed the click themselves live and instead **moves on** to the step's checkpoint — the
+automation never re-attempts an irreversible action after a human was just shown it. Both paths
+are also logged at the escalation level (`escalation.requested` / `escalation.resumed`, with
+`resumedBy`), one layer above the generic `control.transferred` pair, as part of the run's
+evidence.
 
 **Scope note**: the operator console is intentionally a single static page with one button, per
 the brief's explicit allowance. For the recorded evidence, `--auto-resume` substitutes a scripted

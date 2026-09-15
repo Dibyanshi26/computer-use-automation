@@ -139,7 +139,7 @@ async function cmdReplay(flags: Record<string, string | boolean>, inputs: Record
   const runId = `replay-${capabilityId}-${Date.now()}`;
   const logger = new RunLogger(EVIDENCE_DIR, runId);
 
-  const controlServer = flags["with-escalation"] ? new ControlServer() : undefined;
+  const controlServer = flags["with-escalation"] ? new ControlServer(logger) : undefined;
   if (controlServer) {
     await controlServer.start();
     logger.log("escalation.control_server_started", { url: controlServer.url });
